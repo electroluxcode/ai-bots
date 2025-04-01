@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "ai-bots",
   "private": true,
   "scripts": {
     "build": "turbo run build",
