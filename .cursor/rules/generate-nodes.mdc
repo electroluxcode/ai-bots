@@ -35,6 +35,7 @@ globs:
   },
   "devDependencies": {
     "@ai-bots/typescript-config": "workspace:*",
+    "@ai-bots/setting-config": "workspace:*",
     "typescript": "^5.3.3",
     "ts-node": "^10.9.2"
   }
@@ -46,6 +47,14 @@ globs:
 ### 项目结构和内容
 
 项目本身使用turborepo的组织结构，因此注意节点之中的联系和扩展，生成的代码文件需要足够简单，并且需要支持扩展和代码复用。
+
+模型节点只需要实现 deepseek的调用即可，也就是 `DEEPSEEK_API_KEY`
+
+如果需要读取环境变量只需要像下面的代码一样操作即可
+
+```ts
+import { env } from "@ai-bots/setting-config";
+```
 
 ## 最后
 
