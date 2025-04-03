@@ -1,5 +1,6 @@
+import { env } from "@ai-bots/setting-config";
 const app = () => {
-  console.log("Hello, world!");
+  console.log(env);
 }
 app();
 export default app; 
