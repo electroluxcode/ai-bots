@@ -1,0 +1,66 @@
+---
+description: 生成节点文件
+globs: 
+---
+# 任务描述
+
+你即将进行一次项目搭建， 请你根据 [prd.md](mdc:prd.md) 里面的功能往 node-base(基础节点), node-model(模型节点), node-op(操作节点), node-util(工具节点),node-agent(流程节点)中填充节点
+
+## 要求
+
+### 文档/前置工作
+你应该首先按照 当前项目结构/计划/执行记录/当前进度 的顺序进行分析，并且将内容补充进 [generate-nodes.md](mdc:.cursor/tasks/generate-nodes.md) 文档
+
+### 规范
+
+项目本身使用turborepo的组织结构，
+技术栈主要是typescript,
+
+在每一个文件夹的根目录 `package.json` 应该是如下的格式
+
+```json
+{
+  "name": "@ai-bots/mvp",
+  "version": "1.0.0",
+  "description": "Express.js API with TypeScript",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "node --loader ts-node/esm index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@ai-bots/typescript-config": "workspace:*",
+    "@ai-bots/setting-config": "workspace:*",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
+```
+
+其中devDependencies 随着功能的不同可以有扩展但是 `@ai-bots/typescript-config`, `typescript`, `ts-node`, `dotenv` 是最基础的东西
+
+### 项目结构和内容
+
+项目本身使用turborepo的组织结构，因此注意节点之中的联系和扩展，生成的代码文件需要足够简单，并且需要支持扩展和代码复用。
+
+模型节点只需要实现 deepseek的调用即可，也就是 `DEEPSEEK_API_KEY`
+
+如果需要读取环境变量只需要像下面的代码一样操作即可
+
+```ts
+import { env } from "@ai-bots/setting-config";
+```
+
+## 最后
+
+需要你给一个 实现最小mvp的demo
+
+
+
+
+

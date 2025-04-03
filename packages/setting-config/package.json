@@ -1,5 +1,5 @@
 {
-  "name": "@ai-bots/mvp",
+  "name": "@ai-bots/setting-config",
   "version": "1.0.0",
   "description": "Express.js API with TypeScript",
   "main": "dist/index.js",
@@ -10,9 +10,9 @@
     "dev": "node --loader ts-node/esm index.ts"
   },
   "devDependencies": {
+    "dotenv": "^16.3.1",
     "@ai-bots/typescript-config": "workspace:*",
     "typescript": "^5.3.3",
-    "ts-node": "^10.9.2",
-    "@ai-bots/setting-config": "workspace:*"
+    "ts-node": "^10.9.2"
   }
 }
