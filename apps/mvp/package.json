@@ -1,0 +1,23 @@
+{
+  "name": "@ai-bots/mvp",
+  "version": "1.0.0",
+  "description": "Express.js API with TypeScript",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "node --loader ts-node/esm index.ts",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@ai-bots/typescript-config": "workspace:*",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
