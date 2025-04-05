@@ -1,4 +1,4 @@
-import { env } from "@ai-bots/setting-config";
+import { env } from "@ai-bots/configs";
 import { 
     FlowDefinition, 
     NodeBase, 
@@ -7,7 +7,7 @@ import {
     StartNode,
     EndNode,
     LLMNode 
-} from "@ai-bots/common-types";
+} from "@ai-bots/types";
 import { StartNodeExecutor, EndNodeExecutor, NodeExecutor } from "@ai-bots/node-base";
 import { LLMNodeExecutor } from "@ai-bots/node-model";
 import * as fs from 'fs';

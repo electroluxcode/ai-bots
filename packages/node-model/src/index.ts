@@ -6,9 +6,9 @@ import {
     FormInput,
     FieldInput,
     ResponseOutput
-} from "@ai-bots/common-types";
+} from "@ai-bots/types";
 import { NodeExecutor } from "@ai-bots/node-base"; // Assuming NodeExecutor is exported from node-base
-import { env } from "@ai-bots/setting-config"; // For API Key
+import { env } from "@ai-bots/configs"; // For API Key
 import { getValueFromContext, resolveInputValue } from "@ai-bots/utils";
 import axios from 'axios';
 
@@ -26,13 +26,7 @@ export class LLMNodeExecutor extends NodeExecutor {
 
         try {
             return new Promise((resolve)=>{
-                resolve({
-                    data: {
-                        choices: [{
-                            message: { content: "test2222222222222222" }
-                        }]
-                    }
-                })
+                resolve("test2222222222222222")
             })
             const response = await axios.post(
                 'https://api.deepseek.com/chat/completions',

@@ -36,9 +36,9 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
     devDependencies:
-      '@ai-bots/typescript-config':
+      '@ai-bots/configs':
         specifier: workspace:*
-        version: link:../../packages/typescript-config
+        version: link:../../packages/configs
       '@types/cors':
         specifier: ^2.8.17
         version: 2.8.17
@@ -84,18 +84,18 @@ importers:
 
   apps/mvp:
     dependencies:
-      '@ai-bots/common-types':
+      '@ai-bots/configs':
         specifier: workspace:*
-        version: link:../../packages/common-types
+        version: link:../../packages/configs
       '@ai-bots/node-base':
         specifier: workspace:*
         version: link:../../packages/node-base
       '@ai-bots/node-model':
         specifier: workspace:*
         version: link:../../packages/node-model
-      '@ai-bots/setting-config':
+      '@ai-bots/types':
         specifier: workspace:*
-        version: link:../../packages/setting-config
+        version: link:../../packages/types
       '@ai-bots/utils':
         specifier: workspace:*
         version: link:../../packages/utils
@@ -103,9 +103,6 @@ importers:
         specifier: ^16.3.1
         version: 16.4.7
     devDependencies:
-      '@ai-bots/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^20.17.30
         version: 20.17.30
@@ -116,67 +113,11 @@ importers:
         specifier: ^5.3.3
         version: 5.8.2
 
-  packages/common-types:
+  packages/configs:
     devDependencies:
-      '@ai-bots/typescript-config':
+      '@ai-bots/configs':
         specifier: workspace:*
-        version: link:../typescript-config
-      typescript:
-        specifier: ^5.3.3
-        version: 5.8.2
-
-  packages/node-base:
-    dependencies:
-      '@ai-bots/common-types':
-        specifier: workspace:*
-        version: link:../common-types
-      '@ai-bots/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@ai-bots/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@types/node':
-        specifier: ^20
-        version: 20.17.30
-      typescript:
-        specifier: ^5.3.3
-        version: 5.8.2
-
-  packages/node-model:
-    dependencies:
-      '@ai-bots/common-types':
-        specifier: workspace:*
-        version: link:../common-types
-      '@ai-bots/node-base':
-        specifier: workspace:*
-        version: link:../node-base
-      '@ai-bots/setting-config':
-        specifier: workspace:*
-        version: link:../setting-config
-      '@ai-bots/utils':
-        specifier: workspace:*
-        version: link:../utils
-      axios:
-        specifier: ^1.6.8
-        version: 1.8.4
-    devDependencies:
-      '@ai-bots/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@types/node':
-        specifier: ^20
-        version: 20.17.30
-      typescript:
-        specifier: ^5.3.3
-        version: 5.8.2
-
-  packages/setting-config:
-    devDependencies:
-      '@ai-bots/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
+        version: 'link:'
       dotenv:
         specifier: ^16.3.1
         version: 16.4.7
@@ -187,17 +128,68 @@ importers:
         specifier: ^5.3.3
         version: 5.8.2
 
-  packages/typescript-config: {}
+  packages/node-base:
+    dependencies:
+      '@ai-bots/types':
+        specifier: workspace:*
+        version: link:../types
+      '@ai-bots/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@ai-bots/configs':
+        specifier: workspace:*
+        version: link:../configs
+      '@types/node':
+        specifier: ^20
+        version: 20.17.30
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.2
+
+  packages/node-model:
+    dependencies:
+      '@ai-bots/configs':
+        specifier: workspace:*
+        version: link:../configs
+      '@ai-bots/node-base':
+        specifier: workspace:*
+        version: link:../node-base
+      '@ai-bots/types':
+        specifier: workspace:*
+        version: link:../types
+      '@ai-bots/utils':
+        specifier: workspace:*
+        version: link:../utils
+      axios:
+        specifier: ^1.6.8
+        version: 1.8.4
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.17.30
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.2
+
+  packages/types:
+    devDependencies:
+      '@ai-bots/configs':
+        specifier: workspace:*
+        version: link:../configs
+      typescript:
+        specifier: ^5.3.3
+        version: 5.8.2
 
   packages/utils:
     dependencies:
-      '@ai-bots/common-types':
+      '@ai-bots/types':
         specifier: workspace:*
-        version: link:../common-types
+        version: link:../types
     devDependencies:
-      '@ai-bots/typescript-config':
+      '@ai-bots/configs':
         specifier: workspace:*
-        version: link:../typescript-config
+        version: link:../configs
       '@types/node':
         specifier: ^20
         version: 20.17.30

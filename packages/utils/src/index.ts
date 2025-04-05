@@ -1,4 +1,4 @@
-import { FlowContext } from "@ai-bots/common-types";
+import { FlowContext } from "@ai-bots/types";
 
 /**
  * Resolves a value from the flow context based on a path string.

@@ -1,5 +1,5 @@
 {
-  "extends": "@ai-bots/typescript-config/base.json",
+  "extends": "@ai-bots/configs/base.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
