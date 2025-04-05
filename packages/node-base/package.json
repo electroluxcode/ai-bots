@@ -1,0 +1,21 @@
+{
+  "name": "@ai-bots/node-base",
+  "version": "1.0.0",
+  "description": "Base nodes (Start, End) for ai-bots",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@ai-bots/common-types": "workspace:*",
+    "@ai-bots/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@ai-bots/typescript-config": "workspace:*",
+    "typescript": "^5.3.3",
+    "@types/node": "^20"
+  }
+} 

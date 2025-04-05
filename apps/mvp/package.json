@@ -1,18 +1,27 @@
 {
   "name": "@ai-bots/mvp",
   "version": "1.0.0",
-  "description": "Express.js API with TypeScript",
+  "description": "MVP example for ai-bots flow execution",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "node --loader ts-node/esm index.ts"
+    "dev": "node --inspect --loader ts-node/esm src/index.ts --no-emit"
+  },
+  "dependencies": {
+    "@ai-bots/common-types": "workspace:*",
+    "@ai-bots/node-base": "workspace:*",
+    "@ai-bots/node-model": "workspace:*",
+    "@ai-bots/setting-config": "workspace:*",
+    "@ai-bots/utils": "workspace:*",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@ai-bots/typescript-config": "workspace:*",
-    "typescript": "^5.3.3",
+    "@types/node": "^20.17.30",
     "ts-node": "^10.9.2",
-    "@ai-bots/setting-config": "workspace:*"
+    "typescript": "^5.3.3"
   }
 }
