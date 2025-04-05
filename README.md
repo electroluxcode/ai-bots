@@ -78,3 +78,20 @@ Learn more about the power of Turborepo:
 - [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
 - [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
 - [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+
+
+## todo
+在代码块节点中，变量可以这样表示
+```json
+{
+  value: "Hello @Walter White, how are you?",
+  mentions: [
+    {
+      label: "@Walter White",
+      from: 6,  // 起始位置
+      to: 18,   // 结束位置
+    },
+  ]
+}
+
+```
