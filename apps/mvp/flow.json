@@ -9,7 +9,7 @@
             "trigger": "api"
         },
         "input":{
-           "type": "form",
+           "type": "object",
             "content": [{
                 "type": "key",
                 "value": "api_role"
