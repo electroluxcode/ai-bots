@@ -2,7 +2,7 @@ import { Router } from 'express';
 import userRoutes from './userRoutes';
 import healthRoutes from './healthRoutes';
 
-const router = Router();
+const router: Router = Router();
 
 // Health check routes
 router.use('/health', healthRoutes);

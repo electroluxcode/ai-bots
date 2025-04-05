@@ -2,11 +2,8 @@
   "extends": "@ai-bots/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true,
-    "noImplicitAny": false,
-    "lib": ["ES2015"] 
+    "rootDir": "."
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*"], // Adjust include paths if necessary
   "exclude": ["node_modules", "dist"]
 } 
