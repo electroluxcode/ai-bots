@@ -1,13 +1,12 @@
-import { env } from "@ai-bots/setting-config";
+import { env } from "@ai-bots/configs";
 import { 
     FlowDefinition, 
     NodeBase, 
     FlowContext, 
     NodeResult,
     StartNode,
-    EndNode,
-    LLMNode 
-} from "@ai-bots/common-types";
+    EndNode
+} from "@ai-bots/types";
 import { StartNodeExecutor, EndNodeExecutor, NodeExecutor } from "@ai-bots/node-base";
 import { LLMNodeExecutor } from "@ai-bots/node-model";
 import * as fs from 'fs';
@@ -33,6 +32,10 @@ function isStartNode(node: NodeBase): node is StartNode {
     return node.type === 'node-start';
 }
 
+function isEndNode(node: NodeBase): node is EndNode {
+    return node.type === 'node-end';
+}
+
 // Mapping from node type to executor class
 const nodeExecutorRegistry: { [key: string]: typeof NodeExecutor } = {
     'node-start': StartNodeExecutor,
@@ -56,16 +59,21 @@ function getExecutor(node: NodeBase): NodeExecutor {
 
 // Main function to execute the flow
 async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Promise<NodeResult> {
+
+    // step1: find the start node
     const startNodeDef = flow.find(isStartNode);
     if (!startNodeDef) {
         throw new Error("No start node found in the flow definition.");
     }
 
+    // step2: create a map of all nodes
     const nodeMap: Map<string, NodeBase> = new Map(flow.map(node => [node.id, node]));
+
     const context: FlowContext = {}; // Stores results of executed nodes
     let currentNodeIds: string[] = [startNodeDef.id];
     let currentInput: NodeResult = initialInput; // Input for the current node execution step
 
+    // step3: execute the flow
     while (currentNodeIds.length > 0) {
         const nextNodeIds: string[] = [];
         let aggregatedResult: NodeResult = {}; // Used if multiple nodes run in parallel (simple aggregation here)
@@ -79,17 +87,27 @@ async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Prom
             }
 
             console.log(`--- Executing Node: ${nodeDef.name} (${nodeDef.id}) ---`);
+
+            // step4: initialize the node class executor with flow.json
             const executor = getExecutor(nodeDef);
 
              // Validate input before execution (important for start node)
+             // need?
              if (nodeDef.type === 'node-start' && !executor.validateInput(currentInput)) {
                 throw new Error(`Start Node ${nodeDef.id}: Initial input validation failed.`);
             }
             
             try {
                 // Pass the full context and the specific input for this execution step
+
+                /**
+                 * start node: store the input
+                 * end node: format the output
+                 * model node: execute the model
+                 */
                 const result = await executor.execute(context, currentInput);
                 context[nodeId] = result; // Store result in context
+                // input context
                 aggregatedResult = { ...aggregatedResult, ...result }; // Simple merge for this step's output
 
                  // Get next nodes from the executor
@@ -111,7 +129,6 @@ async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Prom
         
         currentNodeIds = [...new Set(nextNodeIds)]; // Get unique next node IDs
         currentInput = aggregatedResult; // The output of this step becomes the input for the next
-        
         if (currentNodeIds.length === 0) {
              console.log("--- Flow Finished: No more nodes to execute. ---");
         }
@@ -120,7 +137,8 @@ async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Prom
     // Should ideally be returned by the End Node execution, but handle cases where flow ends unexpectedly
     console.warn("Flow finished without reaching an end node."); 
     // Find the last executed node's result (simple approach)
-    const lastExecutedNodeId = Object.keys(context).pop();
+
+    const lastExecutedNodeId = flow.find(isEndNode)?.id;
     return lastExecutedNodeId ? context[lastExecutedNodeId] : {};
 }
 
@@ -131,7 +149,7 @@ async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Prom
 const exampleInput: NodeResult = {
     "api_role": "股票分析师",
     "api_content": "请问最近适合投资什么行业"
-};
+}
 
 console.log("Starting AI Bot Flow Execution...");
 console.log("Initial Input:", exampleInput);
@@ -147,7 +165,7 @@ executeFlow(flowDefinition, exampleInput)
     .then(finalResult => {
         console.log("\n--- Flow Execution Completed ---");
         // The result is already logged by the End Node executor or the final step
-        // console.log("Final Flow Result:", finalResult); 
+        console.log("Final Flow Result:", finalResult); 
     })
     .catch(error => {
         console.error("\n--- Flow Execution Failed ---");

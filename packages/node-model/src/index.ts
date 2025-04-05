@@ -6,9 +6,9 @@ import {
     FormInput,
     FieldInput,
     ResponseOutput
-} from "@ai-bots/common-types";
+} from "@ai-bots/types";
 import { NodeExecutor } from "@ai-bots/node-base"; // Assuming NodeExecutor is exported from node-base
-import { env } from "@ai-bots/setting-config"; // For API Key
+import { env } from "@ai-bots/configs"; // For API Key
 import { getValueFromContext, resolveInputValue } from "@ai-bots/utils";
 import axios from 'axios';
 
@@ -25,15 +25,6 @@ export class LLMNodeExecutor extends NodeExecutor {
         }
 
         try {
-            return new Promise((resolve)=>{
-                resolve({
-                    data: {
-                        choices: [{
-                            message: { content: "test2222222222222222" }
-                        }]
-                    }
-                })
-            })
             const response = await axios.post(
                 'https://api.deepseek.com/chat/completions',
                 {
@@ -79,7 +70,7 @@ export class LLMNodeExecutor extends NodeExecutor {
             throw new Error(`LLM Node ${this.node.id}: Input validation failed.`);
         }
 
-        // Construct System Prompt
+        // Core:Construct System Prompt
         let systemPrompt = "";
         if (this.node.param.system_prompt && this.node.param.system_prompt.length > 0) {
              systemPrompt = this.node.param.system_prompt
@@ -89,25 +80,13 @@ export class LLMNodeExecutor extends NodeExecutor {
             console.warn(`LLM Node ${this.node.id}: No system prompt defined.`);
         }
 
-        // Construct User Prompt (Content)
+        // Core:Construct User Prompt (Content)
         let userPrompt = "";
         if (this.node.param.content && this.node.param.content.length > 0) {
             userPrompt = this.node.param.content
                .map(item => this.resolvePromptPart(item, { ...context, [this.node.id]: input })) // Use combined context
                .join('');
-        } else {
-             // Attempt to find a default input if content is not explicitly defined
-             // This is a fallback, relying on a simple convention (e.g., a 'query' key in input)
-             const defaultInputKey = 'api_content'; // Example convention
-             if (input[defaultInputKey]) {
-                 userPrompt = input[defaultInputKey].toString();
-                 console.log(`LLM Node ${this.node.id}: Using default input key '${defaultInputKey}' for user prompt.`);
-             } else {
-                 console.warn(`LLM Node ${this.node.id}: No content definition and default input key '${defaultInputKey}' not found.`);
-                 // Handle case where no prompt can be constructed - maybe throw error?
-                 // For now, proceed with empty prompt, API call might fail.
-             }
-        }
+        } 
         
         console.log(`LLM Node ${this.node.id} - System Prompt:`, systemPrompt);
         console.log(`LLM Node ${this.node.id} - User Prompt:`, userPrompt);

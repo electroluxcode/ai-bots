@@ -10,11 +10,12 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@ai-bots/common-types": "workspace:*"
+    "@ai-bots/types": "workspace:*",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@ai-bots/typescript-config": "workspace:*",
-    "typescript": "^5.3.3",
-    "@types/node": "^20"
+    "@ai-bots/configs": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5.3.3"
   }
-} 
+}

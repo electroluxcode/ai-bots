@@ -8,7 +8,7 @@ import {
     FieldOutput,
     FieldInput,
     FormInput
-} from "@ai-bots/common-types";
+} from "@ai-bots/types";
 import { getValueFromContext } from "@ai-bots/utils"; // Corrected import path
 
 // Abstract class for node execution logic
