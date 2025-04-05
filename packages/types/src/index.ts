@@ -4,6 +4,7 @@ export type NodeId = string;
 
 export interface FormInput {
     type: 'input';
+    key: string;
     value: string | number | boolean;
 }
 

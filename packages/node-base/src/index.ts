@@ -10,6 +10,7 @@ import {
     FormInput
 } from "@ai-bots/types";
 import { getValueFromContext } from "@ai-bots/utils"; // Corrected import path
+import { set } from 'lodash-es';
 
 // Abstract class for node execution logic
 export abstract class NodeExecutor {
@@ -63,30 +64,26 @@ export class EndNodeExecutor extends NodeExecutor {
 
     async execute(context: FlowContext, input: NodeResult): Promise<NodeResult> {
         console.log(`Executing End Node: ${this.node.id}`);
-        // The End node's primary job is to format the final output 
-        // based on its `output` definition.
         const finalOutput: NodeResult = {};
 
         if (!this.node.output || this.node.output.type !== 'form' || !this.node.output.content) {
             console.warn(`End Node ${this.node.id}: No output format defined. Returning raw input.`);
-            return { ...input }; // Return input if no specific output defined
+            return { ...input };
         }
 
         for (const item of this.node.output.content) {
             if (item.type === 'field') {
                 const fieldOutput = item as FieldOutput;
                 try {
-                    // value here is like "nodeId.key"
-                    const value = getValueFromContext(context, fieldOutput.value); 
-                    finalOutput[fieldOutput.key] = value;
+                    const value = getValueFromContext(context, fieldOutput.value);
+                    set(finalOutput, fieldOutput.key, value);
                 } catch (error) {
                     console.error(`End Node ${this.node.id}: Error resolving value for key '${fieldOutput.key}' from '${fieldOutput.value}':`, error);
-                    // Decide how to handle missing values: throw error, use null, etc.
-                    finalOutput[fieldOutput.key] = null; 
+                    set(finalOutput, fieldOutput.key, null);
                 }
             } else if (item.type === 'input') {
-                 const formInput = item as FormInput;
-                 finalOutput[formInput.value.toString()] = formInput.value; // Include constant values if needed
+                const formInput = item as FormInput;
+                set(finalOutput, formInput.key.toString(), formInput.value);
             } else {
                 console.warn(`End Node ${this.node.id}: Unsupported output item type '${item.type}'`);
             }
