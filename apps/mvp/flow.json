@@ -67,6 +67,11 @@
             "type": "form",
             "content": [
                 {
+                    "type": "input",
+                    "key": "code",
+                    "value": "200"
+                },
+                {
                     "type": "field",
                     "key": "data",
                     "value": "大模型节点-456.response",
