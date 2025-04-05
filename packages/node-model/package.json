@@ -1,0 +1,23 @@
+{
+  "name": "@ai-bots/node-model",
+  "version": "1.0.0",
+  "description": "Model nodes (LLM) for ai-bots",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@ai-bots/common-types": "workspace:*",
+    "@ai-bots/utils": "workspace:*",
+    "@ai-bots/setting-config": "workspace:*",
+    "@ai-bots/node-base": "workspace:*",
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "@ai-bots/typescript-config": "workspace:*",
+    "typescript": "^5.3.3",
+    "@types/node": "^20"
+  }
+} 

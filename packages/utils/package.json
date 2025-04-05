@@ -1,0 +1,20 @@
+{
+  "name": "@ai-bots/utils",
+  "version": "1.0.0",
+  "description": "Utility functions for ai-bots",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@ai-bots/common-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@ai-bots/typescript-config": "workspace:*",
+    "typescript": "^5.3.3",
+    "@types/node": "^20"
+  }
+} 

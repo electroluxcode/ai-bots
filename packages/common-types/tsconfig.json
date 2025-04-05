@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "lib": ["ES2015"] 
+    "declaration": true // Generate .d.ts files
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

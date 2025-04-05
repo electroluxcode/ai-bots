@@ -1,0 +1,16 @@
+{
+  "name": "@ai-bots/common-types",
+  "version": "1.0.0",
+  "description": "Common types and interfaces for ai-bots nodes",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@ai-bots/typescript-config": "workspace:*",
+    "typescript": "^5.3.3"
+  }
+} 
