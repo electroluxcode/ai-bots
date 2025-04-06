@@ -55,20 +55,23 @@ const input = {
   api_content: "请问最近适合投资什么行业"
 };
 
+import * as fs from 'fs';
 // 创建空上下文用于工作流执行
 const context = {};
 
-console.log("================ 示例1: 使用 executeFlow 直接执行工作流 ================");
+// console.log("================ 示例1: 使用 executeFlow 直接执行工作流 ================");
 
 // 示例1: 使用 executeFlow 直接执行工作流
-executeFlow(flowDefinition, input)
-  .then(result => {
-    console.log('工作流执行完成:');
-    console.log('最终结果:', result);
-  })
-  .catch(error => {
-    console.error('工作流执行失败:', error);
-  });
+// executeFlow(flowDefinition, input)
+//   .then(result => {
+//     console.log('工作流执行完成:');
+//     console.log('最终结果:', result);
+//     // 结果写入文件
+//     fs.writeFileSync('result.json', JSON.stringify(result, null, 2));
+//   })
+//   .catch(error => {
+//     console.error('工作流执行失败:', error);
+//   });
 
 // 等待示例1执行 
 // setTimeout(() => {
@@ -103,7 +106,7 @@ executeFlow(flowDefinition, input)
 //     });
 // }, 2000);
 
-// // 等待示例3执行
+
 // setTimeout(() => {
 //   console.log("\n================ 示例4: 使用 TaskManager.executeAll 执行多个工作流 ================");
   
@@ -115,7 +118,13 @@ executeFlow(flowDefinition, input)
 //       name: '工作流1',
 //       type: 'node-workflow',
 //       param: {
-//         workflows: flowDefinition
+//         workflows: flowDefinition,
+//         trigger_type: 'scheduled',
+//         execution_mode: 'serial',
+//         schedule: {
+//           cron_expression: '*/5 * * * * *', // 每5秒执行一次，用于演示
+//           timezone: 'Asia/Shanghai'
+//         }
 //       }
 //     },
 //     {
@@ -129,7 +138,8 @@ executeFlow(flowDefinition, input)
 //   ];
 
 //   // 创建 TaskManager 用于并行执行
-//   const parallelManager = new TaskManager(workflowNodes, 'parallel');
+//   // serial/parallel
+//   const parallelManager = new TaskManager(workflowNodes, 'serial');
 
 //   // 并行执行所有工作流
 //   parallelManager.executeAll(context, input)
@@ -146,48 +156,44 @@ executeFlow(flowDefinition, input)
 //     });
 // }, 3000);
 
-// // 等待示例4执行
-// setTimeout(() => {
-//   console.log("\n================ 示例5: 设置定时任务 ================");
-  
-//   // 示例5: 创建定时任务
-//   const taskNode: TaskNode = {
-//     id: 'scheduled-task',
-//     name: '每日任务',
-//     type: 'node-tasks',
-//     param: {
-//       trigger_type: 'scheduled',
-//       execution_mode: 'serial', // 添加执行模式
-//       workflows: flowDefinition,
-//       schedule: {
-//         cron_expression: '*/5 * * * * *', // 每5秒执行一次，用于演示
-//         timezone: 'Asia/Shanghai'
-//       }
-//     }
-//   };
 
-//   // 创建并执行任务节点
-//   const taskExecutor = new TaskNodeExecutor(taskNode);
-//   taskExecutor.execute(context, input)
-//     .then(result => {
-//       console.log('定时任务设置完成:');
-//       console.log('下次执行时间:', result.next_run);
-//       console.log('任务ID:', result.task_id);
+setTimeout(() => {
+  console.log("\n================ 示例5: 设置定时任务 ================");
+  
+  // 示例5: 创建定时任务
+  const taskNode: TaskNode = {
+    id: 'scheduled-task',
+    name: '每日任务',
+    type: 'node-tasks',
+    param: {
+      trigger_type: 'scheduled',
+      execution_mode: 'serial', // 添加执行模式
+      workflows: flowDefinition,
+      schedule: {
+        // 秒、分、时、日、月、周几
+        cron_expression: '5 * * * * *'
+      }
+    }
+  };
+
+  // 创建并执行任务节点 | 只有task节点有定时任务 | 暂时只支持单个workflow
+  const taskExecutor = new TaskNodeExecutor(taskNode);
+  taskExecutor.execute(context, input)
+    .then(result => {
+      console.log('定时任务设置完成:');
+      console.log("目前时间:", new Date().toLocaleString());
+      console.log('下次执行时间:', result.next_run);
+      console.log('任务ID:', result.task_id);
       
-//       // 5秒后运行一次
-//       setTimeout(() => {
-//         console.log("\n立即执行定时任务:");
-//         return taskExecutor.runScheduledTaskNow(context, input);
-//       }, 5000);
       
-//       // 10秒后取消任务并退出
-//       setTimeout(() => {
-//         console.log("\n取消定时任务并退出:");
-//         taskExecutor.cancelScheduledTask();
-//         console.log("示例执行完毕");
-//       }, 10000);
-//     })
-//     .catch(error => {
-//       console.error('定时任务设置失败:', error);
-//     });
-// }, 4000);
+      // 10秒后取消任务并退出
+      // setTimeout(() => {
+      //   console.log("\n取消定时任务并退出:");
+      //   taskExecutor.cancelScheduledTask();
+      //   console.log("示例执行完毕");
+      // }, 10000);
+    })
+    .catch(error => {
+      console.error('定时任务设置失败:', error);
+    });
+}, 4000);

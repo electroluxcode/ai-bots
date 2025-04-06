@@ -19,8 +19,9 @@
   "dependencies": {
     "@ai-bots/node-workflow": "workspace:*",
     "dotenv": "^16.3.1",
+    "fs": "0.0.1-security",
     "lodash-es": "^4.17.21",
-    "node-cron": "^3.0.2"
+    "node-schedule": "^2.1.1"
   },
   "devDependencies": {
     "@ai-bots/configs": "workspace:*",
@@ -29,6 +30,7 @@
     "@ai-bots/utils": "workspace:*",
     "@types/lodash-es": "^4.17.9",
     "@types/node": "^18.19.86",
+    "@types/node-schedule": "^2.1.7",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"

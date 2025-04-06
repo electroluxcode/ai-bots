@@ -198,10 +198,9 @@ taskExecutor.execute(context, input)
 
 ### Classes
 
-- `TaskExecutor`: Executes a single workflow with retry logic and timeout handling
 - `TaskManager`: Manages multiple workflows execution in parallel or serial mode
 - `TaskNodeExecutor`: Implements a node that can manage workflows with scheduling capabilities
-- `TaskScheduler`: Handles scheduling of tasks using cron expressions
+- `TaskScheduler`: `TaskNodeExecutor` uses `TaskScheduler` to handle scheduling of tasks using cron expressions
 
 ## License
 

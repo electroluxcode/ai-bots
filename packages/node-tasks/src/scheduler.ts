@@ -1,6 +1,5 @@
 import { ScheduleConfig } from '@ai-bots/types';
-// Import node-cron as an ES module
-import cron from 'node-cron';
+import * as schedule from 'node-schedule';
 
 // 为 cron 定义自定义类型
 type CronScheduledTask = {
@@ -25,7 +24,7 @@ export interface ScheduledTask {
     id: string;
     schedule: ScheduleConfig;
     task: () => Promise<void>;
-    cronJob?: CronScheduledTask;
+    job?: schedule.Job;
     active: boolean;
     last_run?: Date;
     next_run?: Date;
@@ -37,11 +36,11 @@ export class TaskScheduler {
     /**
      * Schedule a new task
      * @param id Unique identifier for the task
-     * @param schedule Cron schedule configuration
+     * @param scheduleConfig Cron schedule configuration
      * @param task Function to execute when triggered
      * @returns The scheduled task object
      */
-    scheduleTask(id: string, schedule: ScheduleConfig, task: () => Promise<void>): ScheduledTask {
+    scheduleTask(id: string, scheduleConfig: ScheduleConfig, task: () => Promise<void>): ScheduledTask {
         // Check if a task with this ID already exists
         if (this.scheduledTasks.has(id)) {
             throw new Error(`Task with ID ${id} already exists`);
@@ -49,14 +48,17 @@ export class TaskScheduler {
 
         const scheduledTask: ScheduledTask = {
             id,
-            schedule,
+            schedule: scheduleConfig,
             task,
             active: false
         };
 
-        // Create and start the cron job
-        const cronJob = cron.schedule(
-            schedule.cron_expression,
+        // Create the scheduled job with proper timezone handling
+        const job = schedule.scheduleJob(
+            {
+                rule: scheduleConfig.cron_expression,
+                start: new Date()  // 确保从当前时间开始调度
+            },
             async () => {
                 try {
                     scheduledTask.last_run = new Date();
@@ -65,21 +67,24 @@ export class TaskScheduler {
                 } catch (error) {
                     console.error(`Error executing scheduled task ${id}:`, error);
                 }
-            },
-            {
-                scheduled: false,
-                timezone: schedule.timezone
             }
         );
 
-        // Store the cron job reference
-        scheduledTask.cronJob = cronJob;
+        if (!job) {
+            throw new Error(`Failed to create scheduled job for task ${id}`);
+        }
+
+        // Store the job reference
+        scheduledTask.job = job;
         
-        // Calculate next run time
+        // 设置初始的下一次执行时间
         this.updateNextRunTime(scheduledTask);
         
         // Add to our task registry
         this.scheduledTasks.set(id, scheduledTask);
+        
+        // 默认不启动任务
+        job.cancel();
         
         return scheduledTask;
     }
@@ -91,11 +96,16 @@ export class TaskScheduler {
      */
     startTask(id: string): boolean {
         const task = this.scheduledTasks.get(id);
-        if (!task || !task.cronJob) {
+        if (!task || !task.job) {
             return false;
         }
 
-        task.cronJob.start();
+        // 使用完整的调度配置重新调度任务
+        task.job.reschedule({
+            rule: task.schedule.cron_expression,
+            start: new Date()
+        });
+        
         task.active = true;
         this.updateNextRunTime(task);
         
@@ -109,11 +119,11 @@ export class TaskScheduler {
      */
     stopTask(id: string): boolean {
         const task = this.scheduledTasks.get(id);
-        if (!task || !task.cronJob) {
+        if (!task || !task.job) {
             return false;
         }
 
-        task.cronJob.stop();
+        task.job.cancel();
         task.active = false;
         
         return true;
@@ -130,8 +140,8 @@ export class TaskScheduler {
             return false;
         }
 
-        if (task.cronJob) {
-            task.cronJob.stop();
+        if (task.job) {
+            task.job.cancel();
         }
         
         return this.scheduledTasks.delete(id);
@@ -179,19 +189,34 @@ export class TaskScheduler {
      * Calculate and update the next run time for a task
      */
     private updateNextRunTime(task: ScheduledTask): void {
-        if (!task.active) {
+        if (!task.active || !task.job) {
             task.next_run = undefined;
             return;
         }
 
         try {
-            // 简化这部分逻辑，因为 getTasks() 可能会有问题
-            // 使用简单的时间估算
-            const nextDate = new Date();
-            nextDate.setMinutes(nextDate.getMinutes() + 1); // A rough estimate
-            task.next_run = nextDate;
+            // 创建一个新的调度器
+            const tempJob = schedule.scheduleJob({
+                rule: task.schedule.cron_expression,
+                start: new Date(),  // 从当前时间开始计算
+                end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)  // 计算未来一年内的下一次执行时间
+            }, () => {});
+
+            if (tempJob) {
+                const nextRun = tempJob.nextInvocation();
+                // 确保下一次执行时间是未来的时间
+                if (nextRun && nextRun.getTime() > Date.now()) {
+                    task.next_run = nextRun;
+                    console.log(`任务 ${task.id} 的下一次执行时间:`, task.next_run);
+                }
+                tempJob.cancel();
+            } else {
+                console.error(`Failed to calculate next run time for task ${task.id}`);
+                task.next_run = undefined;
+            }
         } catch (error) {
             console.error(`Error calculating next run time for task ${task.id}:`, error);
+            task.next_run = undefined;
         }
     }
     

@@ -60,6 +60,7 @@ export class TaskNodeExecutor extends NodeExecutor {
         // Create a new scheduled task
         this.scheduledTaskId = `task-${this.node.id}-${Date.now()}`;
         
+        // core: 创建一个定时任务, 调用 ai-bots/node-workflow 执行工作流
         const task = this.scheduler.scheduleTask(
             this.scheduledTaskId,
             this.node.param.schedule,
@@ -84,7 +85,7 @@ export class TaskNodeExecutor extends NodeExecutor {
             task_id: this.scheduledTaskId,
             schedule: this.node.param.schedule,
             status: 'scheduled',
-            next_run: task.next_run?.toISOString(),
+            next_run: task.next_run,
             message: `Task scheduled with cron expression: ${this.node.param.schedule.cron_expression}`
         };
     }

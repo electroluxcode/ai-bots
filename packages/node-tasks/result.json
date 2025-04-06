@@ -1,0 +1,28 @@
+{
+  "response": {
+    "id": "a8e1d904-d6d1-41cd-8707-09c0314bced1",
+    "object": "chat.completion",
+    "created": 1743944839,
+    "model": "deepseek-chat",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "作为股票分析师，我建议从以下几个维度评估当前的投资机会：\n\n1. 宏观环境驱动型行业：\n- 新能源产业链（光伏/储能/电动车）：受全球能源转型政策支持，但需注意估值分化\n- 半导体/国产替代：地缘政治因素推动的长期投资主线\n\n2. 经济复苏敏感型：\n- 消费电子：关注AI硬件创新周期带来的换机需求\n- 可选消费：餐饮旅游等线下消费的修复弹性\n\n3. 防御性配置：\n- 医药生物：创新药、医疗器械的估值修复机会\n- 公用事业：高股息特性在当前市场环境下具有配置价值\n\n需要提醒的是：\n1) 建议控制单一行业仓位不超过20%\n2) 关注行业ETF作为分散投资工具\n3) 当前市场环境下更适合采用定投策略\n\n具体配置建议需要结合您的：\n- 投资期限（短期/中长期）\n- 风险承受能力\n- 现有持仓结构\n\n建议持续跟踪：\n- 美联储货币政策动向\n- 国内经济复苏力度\n- 行业景气度指标变化\n\n是否需要对某个细分领域进行更深入的分析？或者您有特定的投资偏好需要纳入考虑？"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 21,
+      "completion_tokens": 248,
+      "total_tokens": 269,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 21
+    }
+  }
+}
