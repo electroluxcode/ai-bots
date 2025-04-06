@@ -22,10 +22,12 @@
     {
         "id": "大模型节点-456",
         "version": "v1",
+        
         "type": "node-model",
         "name": "大模型调用节点",
         "next_nodes": ["结束节点-789"],
         "param":{
+            "provider": "deepseek",
             "modal": "deepseek-chat",
             "knowledge_config": {
                 "max_recall_num": 10,

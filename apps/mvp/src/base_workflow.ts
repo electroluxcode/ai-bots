@@ -12,7 +12,7 @@ const exampleInput = {
 }
 
 // Load the flow definition from flow.json
-const flowFilePath = path.join(process.cwd(), 'flow.json'); // Use path.join for cross-platform compatibility
+const flowFilePath = path.join(process.cwd(), 'base_workflow.json'); // Use path.join for cross-platform compatibility
 let flowDefinition = [];
 try {
     const flowFileContent = fs.readFileSync(flowFilePath, 'utf-8');
