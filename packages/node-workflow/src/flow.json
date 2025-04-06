@@ -1,0 +1,84 @@
+[
+    {
+        "id": "开始节点-123",
+        "version": "v1",
+        "type": "node-start",
+        "name": "开始节点",
+        "next_nodes": ["大模型节点-456"],
+        "param":{
+            "trigger": "api"
+        },
+        "input":{
+           "type": "object",
+            "content": [{
+                "type": "key",
+                "value": "api_role"
+            },{
+                "type": "key",
+                "value": "api_content"
+            }]
+        }
+    },
+    {
+        "id": "大模型节点-456",
+        "version": "v1",
+        "type": "node-model",
+        "name": "大模型调用节点",
+        "next_nodes": ["结束节点-789"],
+        "param":{
+            "modal": "deepseek-chat",
+            "knowledge_config": {
+                "max_recall_num": 10,
+                "min_recall_score": 0.5,
+                "knowledge_id": null
+            },
+            "content": [{
+                "type": "field",
+                "value": "开始节点-123.api_content"
+            }],
+            "system_prompt": [{
+                "type": "input",
+                "value": "你是一个"
+            },{
+                "type": "field",
+                "value" : "开始节点-123.api_role"
+            },{
+                "type": "input",
+                "value" : "，请根据用户的问题给出相应的回答"
+            }]
+        },
+        "output":{
+            "type": "form",
+            "content": [
+                {
+                    "type": "response",
+                    "key": "response",  
+                    "description": "大模型调用节点的返回值"
+                }
+            ]
+        }
+    },
+    {
+        "id": "结束节点-789",
+        "version": "v1",
+        "type": "node-end",
+        "name": "结束节点",
+        "output": {
+            "type": "form",
+            "content": [
+                {
+                    "type": "input",
+                    "key": "code",
+                    "value": "200"
+                },
+                {
+                    "type": "field",
+                    "key": "data",
+                    "value": "大模型节点-456.response",
+                    "description": "结束节点的返回值"
+                }
+            ]
+        },
+        "next_nodes": []
+    }
+] 

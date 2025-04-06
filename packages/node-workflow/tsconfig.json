@@ -1,0 +1,12 @@
+{
+  "extends": "@ai-bots/configs/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "noImplicitAny": false,
+    "lib": ["ES2015"] 
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+} 
