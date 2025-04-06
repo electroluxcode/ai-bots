@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "node --inspect --loader ts-node/esm src/index.ts --no-emit"
+    "workflow": "node --inspect --loader ts-node/esm src/base_workflow.ts --no-emit",
+    "schedule": "node --inspect --loader ts-node/esm src/base_schedule.ts --no-emit"
   },
   "dependencies": {
     "@ai-bots/types": "workspace:*",
@@ -17,6 +18,7 @@
     "@ai-bots/configs": "workspace:*",
     "@ai-bots/utils": "workspace:*",
     "@ai-bots/node-workflow": "workspace:*",
+    "@ai-bots/node-tasks": "workspace:*",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {

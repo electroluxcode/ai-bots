@@ -81,6 +81,7 @@ export interface LLMKnowledgeConfig {
 
 export interface LLMNodeParams {
     modal: string; // e.g., 'DeepSeek-V3'
+    provider?: string; // e.g., 'deepseek', 'openai', etc.
     knowledge_config?: LLMKnowledgeConfig;
     system_prompt?: (FormInput | FieldInput)[]; 
     content?: (FormInput | FieldInput)[]; // User prompt parts
@@ -92,6 +93,39 @@ export interface LLMNode extends NodeBase {
     output: FormContent; // Defines the output structure, e.g., { type: 'response', key: 'response' }
 }
 
+// Task management node types
+
+export type ExecutionMode = 'parallel' | 'serial';
+export type TriggerType = 'manual' | 'scheduled';
+
+export interface WorkflowReference {
+    id: string;
+    name: string;
+    input_mapping?: Record<string, string>; // Maps task input to workflow input
+    output_mapping?: Record<string, string>; // Maps workflow output to task output
+}
+
+export interface ScheduleConfig {
+    cron_expression: string; // e.g., "0 0 * * *" for daily at midnight
+    timezone?: string;       // e.g., "America/New_York"
+    start_date?: string;     // ISO date string
+    end_date?: string;       // ISO date string
+}
+
+export interface TaskNodeParams {
+    execution_mode: ExecutionMode;
+    trigger_type: TriggerType;
+    workflows: NodeBase[];
+    schedule?: ScheduleConfig; // Required if trigger_type is 'scheduled'
+    timeout_ms?: number;      // Global timeout in milliseconds
+    max_retries?: number;     // Maximum retry attempts for failed workflows
+    retry_delay_ms?: number;  // Delay between retries in milliseconds
+}
+
+export interface TaskNode extends NodeBase {
+    type: 'node-tasks';
+    param: TaskNodeParams;
+}
 
 // Type for the overall flow definition
 export type FlowDefinition = NodeBase[];

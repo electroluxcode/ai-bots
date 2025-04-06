@@ -2,57 +2,21 @@ import {
     LLMNode, 
     FlowContext, 
     NodeResult, 
-    NodeBase, 
     FormInput,
     FieldInput,
     ResponseOutput
 } from "@ai-bots/types";
-import { NodeExecutor } from "@ai-bots/node-base"; // Assuming NodeExecutor is exported from node-base
-import { env } from "@ai-bots/configs"; // For API Key
-import { getValueFromContext, resolveInputValue } from "@ai-bots/utils";
-import axios from 'axios';
+import { NodeExecutor } from "@ai-bots/node-base";
+import { resolveInputValue } from "@ai-bots/utils";
+import { ModelProvider, ModelProviderFactory } from "./providers/index.js";
+
+// Export provider types
+export * from "./providers/index.js";
 
 // LLM Node Implementation
 export class LLMNodeExecutor extends NodeExecutor {
     constructor(protected node: LLMNode) {
         super(node);
-    }
-
-    private async callDeepSeekAPI(systemPrompt: string, userPrompt: string): Promise<string> {
-        const apiKey = env.DEEPSEEK_API_KEY;
-        if (!apiKey) {
-            throw new Error("DEEPSEEK_API_KEY environment variable is not set.");
-        }
-
-        try {
-            const response = await axios.post(
-                'https://api.deepseek.com/chat/completions',
-                {
-                    model: this.node.param.modal || "deepseek-chat", // Use configured model or default
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: userPrompt }
-                    ],
-                    stream: false
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`
-                    }
-                }
-            );
-
-            if (response.data && response.data.choices && response.data.choices.length > 0) {
-                return response.data;
-                // .choices[0].message.content
-            }
-            throw new Error("DeepSeek API response was empty or malformed.");
-
-        } catch (error: any) {
-            console.error("Error calling DeepSeek API:", error.response?.data || error.message);
-            throw new Error(`Failed to call DeepSeek API: ${error.message}`);
-        }
     }
 
     private resolvePromptPart(item: FormInput | FieldInput, context: FlowContext): string {
@@ -66,7 +30,7 @@ export class LLMNodeExecutor extends NodeExecutor {
 
     async execute(context: FlowContext, input: NodeResult): Promise<NodeResult> {
         console.log(`Executing LLM Node: ${this.node.id}`);
-        if (!this.validateInput(input)) { // Assuming validateInput is inherited and checks `node.input` if defined
+        if (!this.validateInput(input)) {
             throw new Error(`LLM Node ${this.node.id}: Input validation failed.`);
         }
 
@@ -91,8 +55,21 @@ export class LLMNodeExecutor extends NodeExecutor {
         console.log(`LLM Node ${this.node.id} - System Prompt:`, systemPrompt);
         console.log(`LLM Node ${this.node.id} - User Prompt:`, userPrompt);
 
-        // Call the LLM API
-        const llmResponse = await this.callDeepSeekAPI(systemPrompt, userPrompt);
+        // Get the model provider based on configuration
+        // Use type assertion to handle the provider property that was added to LLMNodeParams
+        const params = this.node.param as any;
+        const providerType = params.provider || 'deepseek'; // Default to DeepSeek if not specified
+
+        // core:
+        const provider = ModelProviderFactory.getProvider(providerType);
+        
+        // Call the LLM API with the model configuration
+        const modelConfig = {
+            model: this.node.param.modal || undefined, // Pass the model name if specified
+            // Additional model-specific configuration can be added here
+        };
+        
+        const llmResponse = await provider.callModel(systemPrompt, userPrompt, modelConfig);
 
         // Structure the output based on the node's output definition
         const outputResult: NodeResult = {};
