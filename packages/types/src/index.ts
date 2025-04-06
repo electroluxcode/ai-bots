@@ -81,6 +81,7 @@ export interface LLMKnowledgeConfig {
 
 export interface LLMNodeParams {
     modal: string; // e.g., 'DeepSeek-V3'
+    provider?: string; // e.g., 'deepseek', 'openai', etc.
     knowledge_config?: LLMKnowledgeConfig;
     system_prompt?: (FormInput | FieldInput)[]; 
     content?: (FormInput | FieldInput)[]; // User prompt parts
