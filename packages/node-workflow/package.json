@@ -1,7 +1,7 @@
 {
-  "name": "@ai-bots/mvp",
+  "name": "@ai-bots/node-workflow",
   "version": "1.0.0",
-  "description": "MVP example for ai-bots flow execution",
+  "description": "Workflow for ai-bots",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -16,7 +16,6 @@
     "@ai-bots/node-model": "workspace:*",
     "@ai-bots/configs": "workspace:*",
     "@ai-bots/utils": "workspace:*",
-    "@ai-bots/node-workflow": "workspace:*",
     "dotenv": "^16.3.1"
   },
   "devDependencies": {
