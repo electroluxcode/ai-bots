@@ -1,23 +1,29 @@
 {
   "name": "@ai-bots/node-model",
   "version": "1.0.0",
-  "description": "Model nodes (LLM) for ai-bots",
+  "description": "LLM model node for AI-Bots workflow system",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "build": "tsc"
   },
   "dependencies": {
-    "@ai-bots/types": "workspace:*",
-    "@ai-bots/utils": "workspace:*",
     "@ai-bots/configs": "workspace:*",
     "@ai-bots/node-base": "workspace:*",
-    "axios": "^1.6.8"
+    "@ai-bots/types": "workspace:*",
+    "@ai-bots/utils": "workspace:*",
+    "axios": "^1.6.2",
+    "openai": "^4.91.1"
   },
   "devDependencies": {
-    "@ai-bots/configs": "workspace:*",
-    "typescript": "^5.3.3",
-    "@types/node": "^20"
+    "@types/node": "^18.15.0",
+    "typescript": "^5.3.3"
   }
-} 
+}

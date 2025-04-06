@@ -1,0 +1,43 @@
+[
+  {
+      "id": "start-node",
+      "version": "v1",
+      "type": "node-start",
+      "name": "开始节点",
+      "next_nodes": ["model-node"],
+      "param":{
+          "trigger": "api"
+      }
+  },
+  {
+      "id": "model-node",
+      "version": "v1",
+      "type": "node-model",
+      "name": "大模型调用节点",
+      "next_nodes": ["end-node"],
+      "param":{
+          "modal": "deepseek-chat",
+          "provider": "deepseek",
+          "knowledge_config": {
+              "max_recall_num": 10,
+              "min_recall_score": 0.5,
+              "knowledge_id": null
+          },
+          "content": [{
+              "type": "input",
+              "value": "请问最近适合投资什么行业"
+          }],
+          "system_prompt": [{
+              "type": "input",
+              "value": "你是一个股票分析师，请根据用户的问题给出相应的回答"
+          }]
+      }
+  },
+  {
+      "id": "end-node",
+      "version": "v1",
+      "type": "node-end",
+      "name": "结束节点",
+      "next_nodes": []
+  }
+]

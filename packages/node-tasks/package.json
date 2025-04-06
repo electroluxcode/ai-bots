@@ -1,0 +1,36 @@
+{
+  "name": "@ai-bots/node-tasks",
+  "version": "1.0.0",
+  "description": "Task management node for AI-Bots workflow system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx examples/basic-usage.ts"
+  },
+  "dependencies": {
+    "@ai-bots/node-workflow": "workspace:*",
+    "dotenv": "^16.3.1",
+    "lodash-es": "^4.17.21",
+    "node-cron": "^3.0.2"
+  },
+  "devDependencies": {
+    "@ai-bots/configs": "workspace:*",
+    "@ai-bots/node-base": "workspace:*",
+    "@ai-bots/types": "workspace:*",
+    "@ai-bots/utils": "workspace:*",
+    "@types/lodash-es": "^4.17.9",
+    "@types/node": "^18.19.86",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}
