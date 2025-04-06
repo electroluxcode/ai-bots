@@ -8,18 +8,6 @@ type CronScheduledTask = {
 };
 
 // 为 cron 模块定义类型
-interface CronModule {
-    schedule: (
-        expression: string, 
-        task: () => void, 
-        options?: { 
-            scheduled?: boolean; 
-            timezone?: string 
-        }
-    ) => CronScheduledTask;
-    getTasks: () => Map<string, CronScheduledTask>;
-}
-
 export interface ScheduledTask {
     id: string;
     schedule: ScheduleConfig;
