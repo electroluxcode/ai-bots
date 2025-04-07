@@ -1,0 +1,12 @@
+{
+  "name": "@ai-bots/ui",
+  "version": "1.0.0",
+  "description": "UI for ai-bots development",
+  "type": "module",
+  "scripts": {
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

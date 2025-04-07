@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Bots - 自由组合搭建AI助理</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #131313;
+            background-image: linear-gradient(45deg, #000 25%, transparent 0, transparent 75%, #000 0), linear-gradient(45deg, #000 25%, transparent 0, transparent 75%, #000 0);
+            background-position: 0 0, 100px 100px;
+            background-size: 200px 200px;
+            color: #f3f4f6;
+            font-family: Arial, sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 页面内容 */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 页头样式 */
+        .header {
+            position: fixed;
+            width: 100%;
+            padding: 0.5rem 0;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            z-index: 40;
+        }
+
+        .header-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.25rem 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            margin-left: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .desktop-menu {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .menu-item {
+            padding: 0.25rem 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        /* 汉堡菜单按钮 */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            z-index: 60;
+            position: relative;
+        }
+        
+        .hamburger svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        /* 侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            transition: right 0.3s ease;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 20px;
+            margin: 10px 0;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-align: center;
+            width: 80%;
+            border-radius: 8px;
+        }
+        main{
+            height: 900px;
+        }
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* 关闭按钮 */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 60;
+            color: white;
+            font-size: 30px;
+        }
+
+        /* 主要内容区域 */
+        .main-section {
+            padding:20vh 0 10vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1280px;
+            padding: 0 1rem;
+            margin: 0 auto;
+        }
+
+        .content-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 1rem;
+            padding-bottom: 2.5rem;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .main-heading {
+            padding: 0.5rem 0;
+            font-size: 3rem;
+            font-weight: bold;
+            background-image: linear-gradient(to top right, #ffffff, #ffe4a3);
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+        }
+
+        .main-description {
+            width: 100%;
+            max-width: 48rem;
+            margin: 0 auto;
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .cta-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .cta-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2.5rem;
+            font-weight: bold;
+            border-radius: 9999px;
+            border: 1px solid;
+            overflow: hidden;
+            background-color: #9feee1;
+            color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .desktop-menu {
+                display: none;
+            }
+
+            .main-heading {
+                font-size: 2rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .main-heading {
+                font-size: 3rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .header-container {
+                padding: 1.25rem 4rem;
+            }
+
+            .main-heading {
+                font-size: 4.5rem;
+            }
+
+            .content-container {
+                max-width: 48rem;
+                gap: 2rem;
+            }
+        }
+
+        /* 图片墙样式 */
+        .gallery-section {
+            padding: 1rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            width: 100%;
+        }
+
+        .gallery-container {
+            /* max-width: 1280px; */
+            margin: 0 auto;
+            padding: 0px 8vw;
+        }
+
+        .gallery-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background-image: linear-gradient(to right, #9feee1, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+
+        .masonry-grid {
+            columns: 3;
+            column-gap: 20px;
+            width: 100%;
+        }
+
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .masonry-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .masonry-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+
+        .item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .masonry-item:hover .item-overlay {
+            opacity: 1;
+        }
+
+        .item-title {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .masonry-grid {
+                columns: 2;
+            }
+            
+            .gallery-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .masonry-grid {
+                columns: 1;
+            }
+            
+            .gallery-title {
+                font-size: 1.5rem;
+            }
+
+            .gallery-section {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* 添加动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .masonry-item {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* 为每个项目添加不同的动画延迟 */
+        .masonry-item:nth-child(1) { animation-delay: 0.1s; }
+        .masonry-item:nth-child(2) { animation-delay: 0.2s; }
+        .masonry-item:nth-child(3) { animation-delay: 0.3s; }
+        .masonry-item:nth-child(4) { animation-delay: 0.4s; }
+        .masonry-item:nth-child(5) { animation-delay: 0.5s; }
+        .masonry-item:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+
+<body>
+    <!-- 页头部分 -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-content">
+                <!-- 左侧 Logo + 标签 -->
+                <div class="logo-container">
+                    <!-- Logo -->
+                    <div class="logo">
+                        <img src="https://slea.ai/logo.png" alt="Logo">
+                        <span class="logo-text">AI-Bots</span>
+                    </div>
+
+                    <div class="desktop-menu">
+                        <span class="menu-item">节点</span>
+                        <span class="menu-item">流程</span>
+                        <span class="menu-item">模板</span>
+                    </div>
+                </div>
+
+                <!-- 汉堡菜单按钮 -->
+                <div class="hamburger" id="hamburger-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="close-btn" id="close-btn">×</div>
+        <a href="#" class="sidebar-item">节点</a>
+        <a href="#" class="sidebar-item">流程</a>
+        <a href="#" class="sidebar-item">模板</a>
+    </div>
+
+    <!-- 内容部分 -->
+    <main class="content">
+        <section class="main-section">
+            <div class="content-wrapper">
+                <div class="content-container">
+                    <h1 class="main-heading">AI workflow - 几分钟内定制你的AI助理</h1>
+                    <p class="main-description">
+                        通过简单的节点组合，轻松搭建专属AI助理，无需编程，拖拽式操作，几分钟内完成配置。</p>
+                    <div class="cta-container">
+                        <a class="cta-button" href="/zh-CN/app">开始创建</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 在main标签内添加节点类型展示 -->
+        <section class="gallery-section">
+            <div class="gallery-container">
+                <h2 class="gallery-title">丰富的节点类型</h2>
+                <div class="masonry-grid">
+                    <!-- 替换为节点类型展示 -->
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/200" alt="基础节点">
+                        <div class="item-overlay">
+                            <span class="item-title">📌 基础节点</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/400" alt="模型节点">
+                        <div class="item-overlay">
+                            <span class="item-title">🧠 模型节点</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/250" alt="操作节点">
+                        <div class="item-overlay">
+                            <span class="item-title">🛠️ 操作节点</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/350" alt="工具节点">
+                        <div class="item-overlay">
+                            <span class="item-title">🧰 工具节点</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/280" alt="流程节点">
+                        <div class="item-overlay">
+                            <span class="item-title">🏗️ 流程节点</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/320" alt="自定义节点">
+                        <div class="item-overlay">
+                            <span class="item-title">🔧 自定义节点</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 添加使用场景展示 -->
+        <section class="gallery-section">
+            <div class="gallery-container">
+                <h2 class="gallery-title">应用场景</h2>
+                <div class="masonry-grid">
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/220" alt="股票分析助手">
+                        <div class="item-overlay">
+                            <span class="item-title">💹 股票分析助手</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/380" alt="代码审查助手">
+                        <div class="item-overlay">
+                            <span class="item-title">💻 代码审查助手</span>
+                        </div>
+                    </div>
+                    <div class="masonry-item">
+                        <img src="https://picsum.photos/300/260" alt="数据分析助手">
+                        <div class="item-overlay">
+                            <span class="item-title">📊 数据分析助手</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 添加JavaScript控制侧边栏 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const sidebar = document.getElementById('sidebar');
+            const closeBtn = document.getElementById('close-btn');
+            
+            // 点击汉堡菜单按钮打开侧边栏
+            hamburgerBtn.addEventListener('click', function() {
+                sidebar.classList.add('open');
+            });
+            
+            // 点击关闭按钮关闭侧边栏
+            closeBtn.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+            });
+            
+            // 点击页面其他区域关闭侧边栏
+            document.addEventListener('click', function(event) {
+                if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

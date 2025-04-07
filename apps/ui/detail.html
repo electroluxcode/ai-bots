@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Bots - 自由组合搭建AI助理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin: 0 auto;
+            height: 100vh;  /* 设置全屏高度 */
+            padding: 20px;  /* 添加内边距 */
+            position: fixed;  /* 固定容器 */
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        /* 左侧操作区 */
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            overflow-y: auto;  /* 允许垂直滚动 */
+            height: 100%;  /* 设置全屏高度 */
+            padding: 0 20px;  /* 添加内边距 */
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px;
+            resize: none;
+        }
+
+        /* 开关样式 */
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .toggle-switch {
+            width: 40px;
+            height: 20px;
+            background: #333;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #ff6b00;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .btn.active {
+            background: #ff6b00;
+        }
+
+        /* 生成按钮 */
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: #ff6b00;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;  /* 添加上边距 */
+            position: static;
+            max-width: none;
+            transform: none;
+        }
+
+        /* 右侧预览区 */
+        .preview {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            height: 100%;  /* 设置全屏高度 */
+            position: sticky;  /* 使预览区保持固定 */
+            top: 20px;
+        }
+
+        .preview-title {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .preview-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .preview-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100% - 60px);
+            color: #666;
+        }
+
+        /* 上传区域样式 */
+        .upload-area {
+            border: 2px dashed #333;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #ff6b00;
+        }
+
+        .upload-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 图片预览 */
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* 颜色选择器组 */
+        .color-pickers {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .color-picker input[type="color"] {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            background: none;
+            cursor: pointer;
+        }
+
+        .color-picker label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 尺寸选择器 */
+        .size-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .size-input {
+            flex: 1;
+        }
+
+        .size-input input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+        .size-input label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        /* 添加滚动条样式 */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 响应式布局 */
+        @media screen and (max-width: 768px) {
+            .container {
+                position: relative;
+                height: auto;
+                padding: 10px;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                overflow: visible;
+                padding: 0;
+            }
+
+            .preview {
+                position: relative;
+                top: 0;
+                height: 300px;
+            }
+
+            .generate-btn {
+                margin-top: 20px;
+                position: static;
+                width: 100%;
+            }
+
+            /* 调整颜色选择器布局 */
+            .color-pickers {
+                flex-wrap: wrap;
+            }
+
+            .color-picker {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            /* 调整尺寸选择器布局 */
+            .size-selector {
+                flex-wrap: wrap;
+            }
+
+            .size-input {
+                width: 100%;
+            }
+
+            /* 调整按钮组布局 */
+            .button-group {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: 80px;
+                text-align: center;
+            }
+
+            /* 移动端上传区域调整 */
+            .upload-area {
+                padding: 15px;
+            }
+
+            .upload-text {
+                font-size: 12px;
+            }
+        }
+
+        /* 平板设备优化 */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                gap: 15px;
+            }
+
+            .sidebar {
+                width: 250px;
+            }
+
+            .preview {
+                min-height: 400px;
+            }
+        }
+
+        /* 处理较小高度的设备 */
+        @media screen and (max-height: 700px) {
+            .sidebar {
+                padding-bottom: 80px;  /* 增加底部padding以确保内容不被按钮遮挡 */
+            }
+
+            textarea {
+                height: 80px;  /* 减小文本框高度 */
+            }
+
+            .section {
+                margin-bottom: 15px;  /* 减小section间距 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧操作区 -->
+        <div class="sidebar">
+            <h1 class="logo">AI-Bots</h1>
+            
+            <div class="section">
+                <div class="section-title">参考图片上传</div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">点击或拖拽图片到此处</div>
+                    <input type="file" id="fileInput" hidden accept="image/*">
+                    <img id="imagePreview" class="image-preview">
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">主要元素</div>
+                <textarea placeholder="请输入您主要元素，例如平果、熊猫等."></textarea>
+            </div>
+
+            <div class="section">
+                <div class="section-title">名称输入</div>
+                <textarea placeholder="请输入名称或相关描述"></textarea>
+            </div>
+
+            <div class="section">
+                <div class="toggle">
+                    <span>反向提示</span>
+                    <div class="toggle-switch"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">设计风格</div>
+                <div class="button-group">
+                    <button class="btn">简约</button>
+                    <button class="btn active">中奢</button>
+                    <button class="btn">复杂</button>
+                    
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">行业</div>
+                <textarea placeholder="请选择所属行业"></textarea>
+            </div>
+
+            <div class="section">
+                <div class="section-title">颜色</div>
+                <div class="color-pickers">
+                    <div class="color-picker">
+                        <input type="color" id="primaryColor" value="#ff6b00">
+                        <label>主色</label>
+                    </div>
+                    <div class="color-picker">
+                        <input type="color" id="secondaryColor" value="#ffffff">
+                        <label>辅色</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">尺寸</div>
+                <div class="size-selector">
+                    <div class="size-input">
+                        <label>宽度 (px)</label>
+                        <input type="number" value="500" min="100" max="2000">
+                    </div>
+                    <div class="size-input">
+                        <label>高度 (px)</label>
+                        <input type="number" value="500" min="100" max="2000">
+                    </div>
+                </div>
+            </div>
+
+            <button class="generate-btn">立即生成</button>
+        </div>
+
+        <!-- 右侧预览区 -->
+        <div class="preview">
+            <h2 class="preview-title">生成</h2>
+            <div class="preview-subtitle">图片仅供参考，请谨慎下载。</div>
+            <div class="preview-content">
+                生成将在这里显示。
+            </div>
+        </div>
+    
+</body>
+<script>
+    // 开关切换功能
+    document.querySelector('.toggle-switch').addEventListener('click', function() {
+        this.classList.toggle('active');
+    });
+
+    // 设计风格按钮切换
+    const styleButtons = document.querySelectorAll('.button-group .btn');
+    styleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 移除其他按钮的激活状态
+            styleButtons.forEach(btn => btn.classList.remove('active'));
+            // 添加当前按钮的激活状态
+            this.classList.add('active');
+        });
+    });
+
+    // 图片上传功能
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ff6b00';
+    });
+
+    uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#333';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#333';
+        const files = e.dataTransfer.files;
+        if (files[0]) {
+            handleFile(files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert('请上传图片文件');
+        }
+    }
+</script>
+</html>
