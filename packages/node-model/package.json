@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "example": "node --inspect --loader ts-node/esm examples/simple-workflow.ts --no-emit"
   },
   "dependencies": {
     "@ai-bots/configs": "workspace:*",
@@ -23,6 +24,7 @@
     "openai": "^4.91.1"
   },
   "devDependencies": {
+    "ts-node": "^10.9.2",
     "@types/node": "^18.15.0",
     "typescript": "^5.3.3"
   }
