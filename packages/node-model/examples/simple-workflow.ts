@@ -94,10 +94,10 @@ async function runExample() {
         // Update context with the result
         context[deepseekNode.id] = deepseekResult;
 
-        console.log("\nRunning OpenAI node:");
-        const openaiExecutor = new LLMNodeExecutor(openaiNode);
-        const openaiResult = await openaiExecutor.execute(context, input);
-        console.log("OpenAI Result:", JSON.stringify(openaiResult, null, 2));
+        // console.log("\nRunning OpenAI node:");
+        // const openaiExecutor = new LLMNodeExecutor(openaiNode);
+        // const openaiResult = await openaiExecutor.execute(context, input);
+        // console.log("OpenAI Result:", JSON.stringify(openaiResult, null, 2));
     } catch (error) {
         console.error("Error running example:", error);
     }

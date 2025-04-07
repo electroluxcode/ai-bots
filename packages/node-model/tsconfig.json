@@ -3,8 +3,6 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "declaration": true,
-    "noImplicitAny": false,
     "lib": ["ES2015"] 
   },
   "include": ["src/**/*"],

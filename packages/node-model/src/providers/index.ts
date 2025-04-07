@@ -1,6 +1,5 @@
 import { env } from "@ai-bots/configs";
-import axios from 'axios';
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 
 // Model Provider Interface
 export interface ModelProvider {
@@ -29,6 +28,7 @@ export class DeepSeekProvider implements ModelProvider {
             console.log("Calling DeepSeek API with model:", modelConfig?.model || "deepseek-chat");
             
             // 使用 OpenAI SDK 调用 DeepSeek API
+            // return "dddddddddddddddddddddddddd"
             const completion = await this.client.chat.completions.create({
                 model: modelConfig?.model || "deepseek-chat",
                 messages: [
