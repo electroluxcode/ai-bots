@@ -134,7 +134,7 @@ async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Prom
     }
 
     // Should ideally be returned by the End Node execution, but handle cases where flow ends unexpectedly
-    console.warn("Flow finished without reaching an end node."); 
+    console.warn("Flow finished without reaching an node."); 
     // Find the last executed node's result (simple approach)
 
     const lastExecutedNodeId = flow.find(isEndNode)?.id;
