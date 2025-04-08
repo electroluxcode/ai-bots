@@ -31,6 +31,9 @@
                 "type": "input",
                 "value": "你是一个股票分析师，请根据用户的问题给出相应的回答"
             }]
+        },
+        "output": {
+            "key": "response"
         }
     },
     {

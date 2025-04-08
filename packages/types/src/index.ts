@@ -46,7 +46,9 @@ export interface NodeBase {
     next_nodes?: NodeId[]; // IDs of the next nodes in the flow
     parent_nodes?: NodeId[]; // IDs of parent nodes (useful for branching/joining later)
     input?: FormContent; // Definition of expected input parameters
-    output?: FormContent; // Definition of output parameters
+    // end node: FormContent
+    // other nodes: { key: string }
+    output?: FormContent | { key: string }; // Definition of output parameters
     param?: Record<string, any>; // Node-specific parameters
 }
 
@@ -90,7 +92,7 @@ export interface LLMNodeParams {
 export interface LLMNode extends NodeBase {
     type: 'node-model';
     param: LLMNodeParams;
-    output: FormContent; // Defines the output structure, e.g., { type: 'response', key: 'response' }
+    output: { key: string }; // Defines the output structure, e.g., { key: 'response' }
 }
 
 // Task management node types

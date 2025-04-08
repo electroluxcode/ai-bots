@@ -7,7 +7,7 @@ import {
     ResponseOutput
 } from "@ai-bots/types";
 import { NodeExecutor } from "@ai-bots/node-base";
-import { resolveInputValue } from "@ai-bots/utils";
+import { resolveInputValue, resolveOutputValue } from "@ai-bots/utils";
 import { ModelProvider, ModelProviderFactory } from "./providers/index.js";
 
 // Export provider types
@@ -63,16 +63,9 @@ export class LLMNodeExecutor extends NodeExecutor {
         
         const llmResponse = await provider.callModel(systemPrompt, userPrompt, modelConfig);
 
-        // Structure the output based on the node's output definition
-        const outputResult: NodeResult = {};
-        const outputDefinition = this.node.output?.content?.[0] as ResponseOutput | undefined;
 
-        if (outputDefinition && outputDefinition.type === 'response') {
-            outputResult[outputDefinition.key] = llmResponse;
-        } else {
-            console.warn(`LLM Node ${this.node.id}: Output definition missing or not of type 'response'. Using default key 'response'.`);
-            outputResult['response'] = llmResponse; // Default output key
-        }
+        // Structure the output based on the node's output definition
+        const outputResult = resolveOutputValue(this.node.output, llmResponse);
 
         console.log(`LLM Node ${this.node.id} output:`, outputResult);
         return outputResult;

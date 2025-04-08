@@ -16,7 +16,9 @@
 
 ### 2. 功能节点
 
-### 2.1 基础-通过class来定义节点
+基础-通过class来定义节点
+
+### 2.1 constructor
 
 ```typescript
 constructor(protected node: LLMNode) {
@@ -24,19 +26,49 @@ constructor(protected node: LLMNode) {
 }
 ```
 
+自动注册node
 
-### 2.2 execute-获取上下文节点
+### 2.2 execute
+
+这个方法中开发需要注意三点, 都是可选的
+
+
+#### 第一: 输入校验
+
+示例代码如下
+```typescript
+if (!this.validateInput(input)) {
+    throw new Error(`Start Node ${this.node.id}: Input validation failed.`);
+}
+
+```
+
+#### 第二：解析上下文
+获取上下文节点示例代码如下
 
 ```typescript
-/**
-    其中 resolveInputValue 的实现 是 根据 item 的 type(input/field) 
-    然后 调用context路径 获取 上下文，注意 field的规则是  
- */
-// type resolveInputValue = (item: { type: string; value: any }, context: FlowContext): any   
+
+// type resolveInputValue = (item: { type: "field" | "input"; value: any }, context: FlowContext): any   
 import { resolveInputValue } from "@ai-bots/utils";
 
-// 获取上下文节点
-const input = resolveInputValue(this.node.param.context, context);
+// 获取上下文节点 伪代码
+const input = resolveInputValue(item, {
+    ...context,
+    [this.node.id]: this.nodeinput
+});
 
+```
+
+
+#### 第三：返回值
+如果需要返回值，则需要调用 `resolveOutputValue` 方法
+
+```typescript
+import { resolveOutputValue } from "@ai-bots/utils";
+
+const output = resolveOutputValue({
+    key: "response"
+}, nodeResult);
+return output;
 
 ```
