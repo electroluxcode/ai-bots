@@ -1,4 +1,4 @@
-import { FlowContext } from "@ai-bots/types";
+import { FlowContext, NodeResult } from "@ai-bots/types";
 import { get } from "lodash-es";
 /**
  * Resolves a value from the flow context based on a path string.
@@ -51,3 +51,22 @@ export function resolveInputValue(item: { type: string; value: any }, context: F
         throw new Error(`Unsupported input item type: ${item.type}`);
     }
 } 
+
+/**
+ * @description 除了结束节点，其他的excute方法 的结尾返回值中需要调用此方法
+ * @param keyObj 
+ * @param output 
+ * @returns 
+ */
+export function resolveOutputValue(keyObj: { key: string }, output: NodeResult): any {
+    const outputResult: NodeResult = {};
+    const outputDefinitionKey = keyObj.key as any | undefined;
+
+    if (outputDefinitionKey) {
+        outputResult[outputDefinitionKey] = output;
+    } else {
+        console.warn(`LLM Node ${this.node.id}: Output definition missing or not of type 'response'. Using default key 'response'.`);
+        outputResult['response'] = output; // Default output key
+    }
+    return outputResult;
+}

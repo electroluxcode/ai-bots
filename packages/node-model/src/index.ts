@@ -7,7 +7,7 @@ import {
     ResponseOutput
 } from "@ai-bots/types";
 import { NodeExecutor } from "@ai-bots/node-base";
-import { resolveInputValue } from "@ai-bots/utils";
+import { resolveInputValue, resolveOutputValue } from "@ai-bots/utils";
 import { ModelProvider, ModelProviderFactory } from "./providers/index.js";
 
 // Export provider types
@@ -19,15 +19,6 @@ export class LLMNodeExecutor extends NodeExecutor {
         super(node);
     }
 
-    private resolvePromptPart(item: FormInput | FieldInput, context: FlowContext): string {
-        try {
-             return resolveInputValue(item, context).toString();
-        } catch (error: any) {
-            console.error(`LLM Node ${this.node.id}: Error resolving prompt part ${JSON.stringify(item)}:`, error.message);
-            return `[Error resolving value: ${item.value}]`; // Return error indicator in prompt
-        }
-    }
-
     async execute(context: FlowContext, input: NodeResult): Promise<NodeResult> {
         console.log(`Executing LLM Node: ${this.node.id}`);
         if (!this.validateInput(input)) {
@@ -36,9 +27,10 @@ export class LLMNodeExecutor extends NodeExecutor {
 
         // Core:Construct System Prompt
         let systemPrompt = "";
+        // resolveInputValue(item, context).toString()
         if (this.node.param.system_prompt && this.node.param.system_prompt.length > 0) {
              systemPrompt = this.node.param.system_prompt
-                .map(item => this.resolvePromptPart(item, { ...context, [this.node.id]: input })) // Add current input to context for resolution
+                .map(item => resolveInputValue(item, { ...context, [this.node.id]: input })) // Add current input to context for resolution
                 .join('');
         } else {
             console.warn(`LLM Node ${this.node.id}: No system prompt defined.`);
@@ -48,7 +40,7 @@ export class LLMNodeExecutor extends NodeExecutor {
         let userPrompt = "";
         if (this.node.param.content && this.node.param.content.length > 0) {
             userPrompt = this.node.param.content
-               .map(item => this.resolvePromptPart(item, { ...context, [this.node.id]: input })) // Use combined context
+               .map(item => resolveInputValue(item, { ...context, [this.node.id]: input })) // Use combined context
                .join('');
         } 
         
@@ -71,16 +63,9 @@ export class LLMNodeExecutor extends NodeExecutor {
         
         const llmResponse = await provider.callModel(systemPrompt, userPrompt, modelConfig);
 
-        // Structure the output based on the node's output definition
-        const outputResult: NodeResult = {};
-        const outputDefinition = this.node.output?.content?.[0] as ResponseOutput | undefined;
 
-        if (outputDefinition && outputDefinition.type === 'response') {
-            outputResult[outputDefinition.key] = llmResponse;
-        } else {
-            console.warn(`LLM Node ${this.node.id}: Output definition missing or not of type 'response'. Using default key 'response'.`);
-            outputResult['response'] = llmResponse; // Default output key
-        }
+        // Structure the output based on the node's output definition
+        const outputResult = resolveOutputValue(this.node.output, llmResponse);
 
         console.log(`LLM Node ${this.node.id} output:`, outputResult);
         return outputResult;

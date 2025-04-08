@@ -36,13 +36,7 @@ async function runExample() {
             ]
         } as any, // Type assertion to bypass property checking
         output: {
-            type: "form",
-            content: [
-                {
-                    type: "response",
-                    key: "response"
-                }
-            ]
+            key: "response",
         }
     };
 
@@ -70,13 +64,7 @@ async function runExample() {
             ]
         } as any, // Type assertion to bypass property checking
         output: {
-            type: "form",
-            content: [
-                {
-                    type: "response",
-                    key: "response"
-                }
-            ]
+           key: "response",
         }
     };
 

@@ -50,14 +50,7 @@
             }]
         },
         "output":{
-            "type": "form",
-            "content": [
-                {
-                    "type": "response",
-                    "key": "response",  
-                    "description": "大模型调用节点的返回值"
-                }
-            ]
+            "key": "response"
         }
     },
     {
