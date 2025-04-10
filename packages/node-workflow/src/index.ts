@@ -9,6 +9,7 @@ import {
 } from "@ai-bots/types";
 import { StartNodeExecutor, EndNodeExecutor, NodeExecutor } from "@ai-bots/node-base";
 import { LLMNodeExecutor } from "@ai-bots/node-model";
+import { UtilsNodeExecutor } from "@ai-bots/node-utils";
 // import * as fs from 'fs';
 // import * as path from 'path';
 
@@ -40,6 +41,7 @@ const nodeExecutorRegistry: { [key: string]: typeof NodeExecutor } = {
     'node-start': StartNodeExecutor,
     'node-end': EndNodeExecutor,
     'node-model': LLMNodeExecutor,
+    'node-utils': UtilsNodeExecutor
     // Add other node types here as they are implemented
 };
 
@@ -104,7 +106,7 @@ async function executeFlow(flow: FlowDefinition, initialInput: NodeResult): Prom
                  * end node: format the output
                  * model node: execute the model
                  */
-                const result = await executor.execute(context, currentInput);
+                const result = await executor.execute(context, currentInput, nodeDef);
                 context[nodeId] = result; // Store result in context
                 // input context
                 aggregatedResult = { ...aggregatedResult, ...result }; // Simple merge for this step's output
