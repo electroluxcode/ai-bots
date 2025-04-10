@@ -24,7 +24,7 @@ export abstract class NodeExecutor {
     }
 
     // Abstract method to be implemented by specific node types
-    abstract execute(context: FlowContext, input: NodeResult): Promise<NodeResult>;
+    abstract execute(context: FlowContext, input: NodeResult, NodeDef: any): Promise<NodeResult>;
 
     getNextNodes(): NodeId[] {
         return this.node.next_nodes || [];
