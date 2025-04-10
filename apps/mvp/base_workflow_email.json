@@ -1,0 +1,115 @@
+[
+    {
+        "id": "开始节点-123",
+        "version": "v1",
+        "type": "node-start",
+        "name": "开始节点",
+        "next_nodes": ["大模型节点-456"],
+        "param":{
+            "trigger": "api"
+        },
+        "input":{
+           "type": "object",
+            "content": [{
+                "type": "key",
+                "value": "api_role"
+            },{
+                "type": "key",
+                "value": "api_content"
+            }]
+        }
+    },
+    {
+        "id": "大模型节点-456",
+        "version": "v1",
+        "type": "node-model",
+        "name": "大模型调用节点",
+        "next_nodes": ["邮件节点-789"],
+        "param":{
+            "provider": "deepseek",
+            "modal": "deepseek-chat",
+            "knowledge_config": {
+                "max_recall_num": 10,
+                "min_recall_score": 0.5,
+                "knowledge_id": null
+            },
+            "content": [{
+                "type": "field",
+                "value": "开始节点-123.api_content"
+            }],
+            "system_prompt": [{
+                "type": "input",
+                "value": "你是一个"
+            },{
+                "type": "field",
+                "value" : "开始节点-123.api_role"
+            },{
+                "type": "input",
+                "value" : "，请根据用户的问题给出相应的回答,输出尽可能简短"
+            }]
+        },
+        "output":{
+            "key": "response"
+        }
+    },
+    {
+        "id": "邮件节点-789",
+        "version": "v1",
+        "type": "node-utils",
+        "name": "Email设置节点",
+        "next_nodes": ["结束节点-789"],
+        "param": {
+            "type": "email",
+            "prettyFn": "async (param) => { let textTemple = \"\"; param.choices.forEach(page => { textTemple = textTemple + '<div style=\"margin-bottom:20px;border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding:10px 10px\"><div><a style=\"text-decoration: none; color: #007BFF;\">' + param.user_prompt + '</a></div><div style=\"font-size: 10px;margin-top:5px\"><strong>来源:</strong> ' + param.model + '</div><div style=\"font-size: 10px;margin-top:5px\"><strong>摘要:</strong> ' + page.message.content + '</div></div>'; }); return textTemple; }",
+            "content": [
+                {
+                    "type": "input",
+                    "key": "from",
+                    "value": "3451613934@qq.com"
+                },
+                {
+                    "type": "input",
+                    "key": "to",
+                    "value": "895361337@qq.com"
+                },
+                {
+                    "type": "input",
+                    "key": "subject",
+                    "value": "每日金融策略"
+                },
+                {
+                    "type": "field",
+                    "key": "html",
+                    "value": "大模型节点-456.response"
+                }
+            ]
+        },
+        "output": {
+            "key": "response"
+        }
+    },
+
+    {
+        "id": "结束节点-789",
+        "version": "v1",
+        "type": "node-end",
+        "name": "结束节点",
+        "output": {
+            "type": "form",
+            "content": [
+                {
+                    "type": "input",
+                    "key": "code",
+                    "value": "200"
+                },
+                {
+                    "type": "field",
+                    "key": "data",
+                    "value": "大模型节点-456.response",
+                    "description": "结束节点的返回值"
+                }
+            ]
+        },
+        "next_nodes": []
+    }
+] 

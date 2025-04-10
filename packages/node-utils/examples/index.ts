@@ -7,25 +7,32 @@ let context = {
 
 let emailNode = {
     id: "email-node",
-    name: "Email",
+    name: "Email设置节点",
     type: "node-utils",
     param: {
         type: "email",
         content: [
             {
-                type: "field",
-                key: "user_prompt",
-                value: "开始节点-123.before_content"
-            }
+                "type": "input",
+                "key": "from",
+                "value": "3451613934@qq.com"
+            },
+            {
+                "type": "input",
+                "key": "to",
+                "value": "895361337@qq.com"
+            },
+            {
+                "type": "input",
+                "key": "subject",
+                "value": "测试title"
+            },
+            {
+                "type": "field",
+                "key": "text",
+                "value": "开始节点-123.before_content"
+            },
         ],
-        config: {
-            host: "smtp.163.com",
-            port: 465,
-            auth: {
-                user: "your_email@163.com",
-                pass: "your_password"
-            }
-        }
     } as any, // Type assertion to bypass property checking
     output: {
         key: "response",

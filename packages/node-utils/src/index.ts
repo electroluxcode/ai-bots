@@ -4,29 +4,23 @@ import {
     NodeResult,
 } from "@ai-bots/types";
 import { NodeExecutor } from "@ai-bots/node-base";
-import { resolveInputValue } from "@ai-bots/utils";
+import { EmailNodeExecutor } from "./node-utils-email.js";
 
 const RegisterUtilsNode = {
-    "email": {
-        "name": "email",
-        "description": "发送邮件",
-        "input": {
-            "type": "input",
-        }
-    }
+    "email": EmailNodeExecutor
 }
 
 
 class UtilsNodeExecutor extends NodeExecutor {
     async execute(context: FlowContext, initialInput: NodeResult, NodeDef: any): Promise<NodeResult> {
-        console.log("UtilsNodeExecutor", {
-            context,
-            initialInput,
-            NodeDef
-        });
-        const before_content = resolveInputValue(this.node.param.content[0], context);
-        console.log("before_content222222222", before_content);
-        return
+      
+        const type = this.node.param.type;
+        const executor = new RegisterUtilsNode[type](NodeDef);
+        if (!executor) {
+            throw new Error(`UtilsNodeExecutor: ${type} is not registered`);
+        }
+        const result =await executor.callUtil(context);
+        return result;
     }
 }
 

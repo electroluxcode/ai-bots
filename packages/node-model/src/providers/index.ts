@@ -28,7 +28,6 @@ export class DeepSeekProvider implements ModelProvider {
             console.log("Calling DeepSeek API with model:", modelConfig?.model || "deepseek-chat");
             
             // 使用 OpenAI SDK 调用 DeepSeek API
-            // return "dddddddddddddddddddddddddd"
             const completion = await this.client.chat.completions.create({
                 model: modelConfig?.model || "deepseek-chat",
                 messages: [
@@ -38,6 +37,8 @@ export class DeepSeekProvider implements ModelProvider {
             });
             return {
                 id: completion.id,
+                user_prompt: userPrompt,
+                system_prompt: systemPrompt,
                 object: completion.object,
                 created: completion.created,
                 model: completion.model,

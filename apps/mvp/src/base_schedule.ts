@@ -50,7 +50,7 @@ const taskNode: TaskNode = {
 
   // 创建并执行任务节点 | 只有task节点有定时任务 | 暂时只支持单个workflow
   const taskExecutor = new TaskNodeExecutor(taskNode);
-  taskExecutor.execute({}, {})
+  taskExecutor.execute({}, exampleInput)
     .then(result => {
       console.log('定时任务设置完成:');
       console.log("目前时间:", new Date().toLocaleString());
