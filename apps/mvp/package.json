@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "workflow": "node --inspect --loader ts-node/esm src/base_workflow.ts --no-emit",
-    "schedule": "node --inspect --loader ts-node/esm src/base_schedule.ts --no-emit"
+    "schedule": "node --inspect --loader ts-node/esm src/base_schedule.ts --no-emit",
+    "workflow-email": "node --inspect --loader ts-node/esm src/base_workflow_util.ts --no-emit"
   },
   "dependencies": {
     "@ai-bots/types": "workspace:*",
