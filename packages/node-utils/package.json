@@ -12,12 +12,13 @@
     "dev": "node --inspect --loader ts-node/esm src/index.ts --no-emit"
   },
   "dependencies": {
-    "@ai-bots/types": "workspace:*",
+    "@ai-bots/configs": "workspace:*",
     "@ai-bots/node-base": "workspace:*",
     "@ai-bots/node-model": "workspace:*",
-    "@ai-bots/configs": "workspace:*",
+    "@ai-bots/types": "workspace:*",
     "@ai-bots/utils": "workspace:*",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "nodemailer": "^6.10.0"
   },
   "devDependencies": {
     "@ai-bots/configs": "workspace:*",

@@ -70,3 +70,17 @@ export function resolveOutputValue(keyObj: { key: string }, output: NodeResult):
     }
     return outputResult;
 }
+
+/**
+ * @description 除了结束节点，其他的excute方法 的结尾返回值中需要调用此方法
+ * @param keyObj 
+ * @param output 
+ * @returns 
+ */
+export function arrayToObjByKey(array: any[], key: string): Record<any, any> {
+    const outputResult: Record<any, any> = {};
+    array.forEach(item => {
+        outputResult[item[key]] = item;
+    });
+    return outputResult;
+}
