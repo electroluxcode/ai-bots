@@ -18,7 +18,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
   }, [selectedNode]);
 
   const handleInputChange = useCallback(
-    (key: string, value: string) => {
+    (key: any, value: string) => {
       if (!nodeData || !selectedNode) return;
       
       const updatedData = { ...nodeData };
