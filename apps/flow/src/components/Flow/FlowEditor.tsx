@@ -112,12 +112,22 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
         y: event.clientY,
       });
 
-      const newNodeId = `${nodeType}-${uuidv4().slice(0, 8)}`;
+      // 生成一个简短但有意义的ID
+      const timestamp = new Date().getTime().toString().slice(-6);
+      const newNodeId = `${nodeType}-${timestamp}`;
 
       // Default parameters based on node type
       let param: Record<string, unknown> = {};
+      let content: Array<Record<string, unknown>> = [];
+      let output: Record<string, unknown> | undefined = undefined;
+      
       if (nodeType === 'node-start') {
         param = { trigger: 'api' };
+        content = [];
+        output = {
+          key: "response",
+          type: "object"
+        };
       } else if (nodeType === 'node-model') {
         param = {
           provider: 'deepseek',
@@ -127,15 +137,37 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
             min_recall_score: 0.5,
             knowledge_id: null,
           },
-          content: [{ type: 'input', value: '' }],
           system_prompt: [{ type: 'input', value: '' }],
+        };
+        content = [{ type: 'input', value: '' }];
+        output = {
+          key: "response"
         };
       } else if (nodeType === 'node-utils') {
         param = { type: 'email' };
+        content = [
+          { type: 'input', key: 'from', value: '' },
+          { type: 'input', key: 'to', value: '' },
+          { type: 'input', key: 'subject', value: '' }
+        ];
+        output = {
+          key: "response"
+        };
       } else if (nodeType === 'node-custom') {
         param = { 
           customField: '默认值',
           otherProperty: '其他默认值'
+        };
+        content = [{ type: 'input', value: '' }];
+        output = {
+          key: "custom_output"
+        };
+      } else if (nodeType === 'node-end') {
+        output = {
+          type: "form",
+          content: [
+            { type: 'input', key: 'code', value: '200' }
+          ]
         };
       }
 
@@ -143,7 +175,13 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
         id: newNodeId,
         type: nodeType,
         position,
-        data: { name: nodeName, param, next_nodes: [] },
+        data: { 
+          name: nodeName, 
+          param, 
+          content,
+          output,
+          next_nodes: [] 
+        },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -228,6 +266,43 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
     [setNodes]
   );
 
+  // 初始化时，添加监听器来处理ID变更
+  useEffect(() => {
+    const handleNodeIdChange = (event: CustomEvent) => {
+      const { oldId, newId } = event.detail;
+      
+      // 更新节点
+      setNodes((nds) => 
+        nds.map((node) => {
+          if (node.id === oldId) {
+            return { ...node, id: newId };
+          }
+          return node;
+        })
+      );
+      
+      // 更新边
+      setEdges((eds) => 
+        eds.map((edge) => {
+          if (edge.source === oldId) {
+            return { ...edge, source: newId, id: `${newId}-${edge.target}` };
+          }
+          if (edge.target === oldId) {
+            return { ...edge, target: newId, id: `${edge.source}-${newId}` };
+          }
+          return edge;
+        })
+      );
+    };
+    
+    window.addEventListener('node-id-change', handleNodeIdChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('node-id-change', handleNodeIdChange as EventListener);
+    };
+  }, [setNodes, setEdges]);
+
+  // 修改 handleSaveFlow 函数以正确处理 input 和 content 字段
   const handleSaveFlow = useCallback(() => {
     if (!onSave) return;
     
@@ -240,10 +315,12 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
       return {
         id: node.id,
         version: 'v1',
-        type: node.type || '', // Ensure type is always a string
+        type: node.type || '', 
         name: node.data.name || '',
         next_nodes: nextNodes,
         param: node.data.param || {},
+        content: node.data.content || [],
+        input: node.data.input,
         output: node.data.output,
       };
     });
