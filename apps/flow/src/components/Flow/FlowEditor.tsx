@@ -61,16 +61,45 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
     left: number;
   } | null>(null);
 
-  const initialNodes: Array<Node> = flowData.map((node, index) => ({
-    id: node.id,
-    type: node.type,
-    position: { x: 250, y: index * 150 },
-    data: {
-      name: node.name,
-      param: node.param,
-      output: node.output,
-    },
-  }));
+  // 优化节点初始位置计算，提供更合理的布局
+  const initialNodes: Array<Node> = flowData.map((node, index) => {
+    // 基础位置
+    let xPosition = 150;
+    let yPosition = index * 250;
+    
+    // 根据节点类型调整位置
+    // 开始节点靠左上
+    if (node.type === 'node-start') {
+      xPosition = 150;
+      yPosition = 100;
+    } 
+    // 结束节点靠右下
+    else if (node.type === 'node-end') {
+      xPosition = 150;
+      yPosition = (flowData.length - 1) * 250 // 确保在最下方
+    }
+    // 模型节点和其他节点分散在中间
+    else if (node.type === 'node-model') {
+      // 找出处于第几个模型节点
+      const modelNodeIndex = flowData
+        .filter(n => n.type === 'node-model')
+        .findIndex(n => n.id === node.id);
+      
+      xPosition = 150;
+      yPosition = 250 + modelNodeIndex * 250; // 模型节点间距更大
+    }
+    
+    return {
+      id: node.id,
+      type: node.type,
+      position: { x: xPosition, y: yPosition },
+      data: {
+        name: node.name,
+        param: node.param,
+        output: node.output,
+      },
+    };
+  });
 
   const initialEdges: Array<Edge> = flowData.flatMap((node) =>
     node.next_nodes.map((target) => ({
