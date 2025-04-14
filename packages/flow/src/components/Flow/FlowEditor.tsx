@@ -15,7 +15,6 @@ import ReactFlow, {
   useKeyPress,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { v4 as uuidv4 } from 'uuid';
 
 import { StartNode } from './nodes/StartNode';
 import { ModelNode } from './nodes/ModelNode';
@@ -34,21 +33,35 @@ const nodeTypes: NodeTypes = {
   'node-custom': CustomNode,
 };
 
-interface FlowData {
-  id: string;
-  version: string;
-  type: string;
-  name: string;
-  next_nodes: Array<string>;
-  param: Record<string, unknown>;
-  output?: Record<string, unknown>;
-}
-
-interface FlowEditorProps {
-  flowData: Array<FlowData>;
-  onSave?: (data: Array<FlowData>) => void;
-}
-
+// 为了方便外部使用，直接从types中导入接口
+type FlowEditorProps = {
+  flowData: any[];
+  onSave: (data: any[]) => void;
+};
+/**
+ * 流程编辑器组件
+ * 使用示例:
+ * 
+ * ```tsx
+ * import { FlowEditor, FlowData } from '@ai-bots/flow';
+ * import '@ai-bots/flow/style.css';
+ * 
+ * const MyApp = () => {
+ *   const handleSave = (data: FlowData[]) => {
+ *     console.log('流程数据:', data);
+ *   };
+ *   
+ *   return (
+ *     <div style={{ height: '800px' }}>
+ *       <FlowEditor 
+ *         flowData={myFlowData} 
+ *         onSave={handleSave} 
+ *       />
+ *     </div>
+ *   );
+ * };
+ * ```
+ */
 export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
@@ -86,7 +99,7 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
         .findIndex(n => n.id === node.id);
       
       xPosition = 150;
-      yPosition = 250 + modelNodeIndex * 250; // 模型节点间距更大
+      yPosition = 250 + modelNodeIndex * 300; // 模型节点间距更大
     }
     
     return {
@@ -96,13 +109,15 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
       data: {
         name: node.name,
         param: node.param,
+        content: node.content,
+        input: node.input,
         output: node.output,
       },
     };
   });
 
   const initialEdges: Array<Edge> = flowData.flatMap((node) =>
-    node.next_nodes.map((target) => ({
+    node.next_nodes.map((target: any) => ({
       id: `${node.id}-${target}`,
       source: node.id,
       target,
@@ -358,8 +373,8 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
   }, [nodes, edges, onSave]);
 
   return (
-    <div className="flex h-screen">
-      <div className="w-64 p-4 overflow-auto bg-gray-100">
+    <div className="ai-bots-flow-editor">
+      <div className="ai-bots-flow-editor__node-panel">
         <NodePanel 
           onDragStart={(event, nodeType, nodeName) => {
             event.dataTransfer.setData('application/reactflow/type', nodeType);
@@ -376,9 +391,9 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
         )}
       </div>
       
-      <div className="flex flex-col flex-1">
+      <div className="ai-bots-flow-editor__main">
         <div 
-          className="flex-1" 
+          className="w-full h-full" 
           ref={reactFlowWrapper}
         >
           <ReactFlow
@@ -423,7 +438,7 @@ export const FlowEditor = ({ flowData, onSave }: FlowEditorProps): JSX.Element =
         </div>
       </div>
       
-      <div className="p-4 overflow-auto bg-gray-100 w-80">
+      <div className="ai-bots-flow-editor__properties">
         <NodeProperties 
           selectedNode={selectedNode}
           onNodeUpdate={onNodeUpdate}
