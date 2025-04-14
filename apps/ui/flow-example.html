@@ -133,8 +133,10 @@
     <link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css" />
     
     <!-- 引入构建后的 @ai-bots/flow 包 -->
-    <script src="https://cdn.jsdelivr.net/npm/@ai-bots/flow/dist/index.umd.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ai-bots/flow/dist/style.css" />
+     <script src="https://cdn.jsdelivr.net/npm/@ai-bots/flow@1.0.2/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ai-bots/flow@1.0.2/dist/style.css" />
+    <!-- <script src="../flow/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="../flow/dist/style.css" /> -->
 </head>
 
 <body>
@@ -157,50 +159,48 @@
     <script>
         // 初始化流程数据
         const initialWorkflow = [
-            {
-                "id": "开始节点-123",
-                "version": "v1",
-                "type": "node-start",
-                "name": "开始节点",
-                "next_nodes": ["大模型节点-456"],
-                "param": {
-                    "trigger": "api"
-                }
-            },
-            {
-                "id": "大模型节点-456",
-                "version": "v1",
-                "type": "node-model",
-                "name": "大模型调用节点",
-                "next_nodes": ["结束节点-789"],
-                "param": {
-                    "provider": "deepseek",
-                    "modal": "deepseek-chat",
-                    "knowledge_config": {
-                        "max_recall_num": 10,
-                        "min_recall_score": 0.5,
-                        "knowledge_id": null
-                    },
-                    "content": [{
-                        "type": "input",
-                        "value": "请问最近适合投资什么行业"
-                    }],
-                    "system_prompt": [{
-                        "type": "input",
-                        "value": "你是一个股票分析师，请根据用户的问题给出相应的回答"
-                    }]
-                }
-            },
-            {
-                "id": "结束节点-789",
-                "version": "v1",
-                "type": "node-end",
-                "name": "结束节点",
-                "next_nodes": [],
-                "param": {}
-            }
-        ];
-
+  {
+    "id": "开始节点-123",
+    "version": "v1",
+    "type": "node-start",
+    "name": "开始节点",
+    "next_nodes": ["大模型节点-456"],
+    "param": {
+      "trigger": "api"
+    }
+  },
+  {
+    "id": "大模型节点-456",
+    "version": "v1",
+    "type": "node-model",
+    "name": "大模型调用节点",
+    "next_nodes": ["结束节点-789"],
+    "param": {
+      "provider": "deepseek",
+      "modal": "deepseek-chat",
+      "knowledge_config": {
+        "max_recall_num": 10,
+        "min_recall_score": 0.5,
+        "knowledge_id": null
+      },
+      "content": [{
+        "type": "input",
+        "value": "请问最近适合投资什么行业"
+      }],
+      "system_prompt": [{
+        "type": "input",
+        "value": "你是一个股票分析师，请根据用户的问题给出相应的回答"
+      }]
+    }
+  },
+  {
+    "id": "结束节点-789",
+    "version": "v1",
+    "type": "node-end",
+    "name": "结束节点",
+    "next_nodes": []
+  }
+]
         // 获取DOM元素
         const flowEditorContainer = document.getElementById('flow-editor');
         const jsonContent = document.getElementById('json-content');
