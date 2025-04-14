@@ -224,7 +224,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
         label: string;
         type: 'text' | 'select';
         options?: Array<{value: string; label: string}>;
-      }>
+      }>,
+      template?: any // Optional template parameter
     ) => {
       if (!nodeData) return null;
       
@@ -245,6 +246,12 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
       };
       
       const arrayData = getArrayData();
+
+      // 创建默认的模板，如果没有提供则基于字段创建
+      const fieldTemplate = template || fields.reduce((acc: Record<string, string>, field) => {
+        acc[field.key] = field.key === 'type' ? 'input' : ''; // 为type字段默认设置为'input'
+        return acc;
+      }, {});
       
       return (
         <div className="p-2 my-3 border border-gray-200 rounded-md">
@@ -400,10 +407,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             </div>
           ))}
           
-          {renderAddFieldButton(arrayPath, fields.reduce((acc: Record<string, string>, field) => {
-            acc[field.key] = '';
-            return acc;
-          }, {}))}
+          {renderAddFieldButton(arrayPath, fieldTemplate)}
         </div>
       );
     },
@@ -459,7 +463,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'value', label: '值' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
@@ -542,7 +547,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'field', label: '引用字段' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       {/* 内容配置 */}
@@ -555,7 +561,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'field', label: '引用字段' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
@@ -627,7 +634,9 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { key: 'key', label: '键名', type: 'text' },
             { key: 'value', label: '值', type: 'text' },
             { key: 'description', label: '描述', type: 'text' }
-          ]
+          ],
+          // 提供一个完整的模板，确保类型默认为'input'
+          { type: 'input', key: '', value: '', description: '' }
         )}
       </>
     );
@@ -669,7 +678,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
           ]},
           { key: 'key', label: '键名', type: 'text' },
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
@@ -730,7 +740,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'field', label: '引用字段' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
