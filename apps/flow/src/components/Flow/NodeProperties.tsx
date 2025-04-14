@@ -258,7 +258,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
           <h4 className="mb-2 text-sm font-medium text-gray-700">{titleKey}</h4>
           
           {arrayData.map((item: any, index) => (
-            <div key={index} className="p-2 mb-3 rounded bg-gray-50">
+            <div className="p-2 mb-3 rounded bg-gray-50">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-500">项目 #{index + 1}</span>
                 <button
@@ -307,7 +307,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
               </div>
               
               {fields.map((field) => (
-                <div key={field.key} className="mb-2">
+                <div className="mb-2">
                   <label className="block mb-1 text-xs font-medium text-gray-700">
                     {field.label}
                   </label>
@@ -354,7 +354,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
                       }}
                     >
                       {field.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
+                        <option value={option.value}>
                           {option.label}
                         </option>
                       ))}
