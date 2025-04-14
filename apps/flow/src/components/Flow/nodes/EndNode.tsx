@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow';
 interface EndNodeProps {
   data: {
     name: string;
-    output: {
+    output?: {
       type: string;
       content: Array<{
         type: string;
@@ -21,7 +21,7 @@ export const EndNode = ({ data, id }: EndNodeProps): JSX.Element => {
   const outputFieldCount = data.output?.content?.length || 0;
   
   return (
-    <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-red-400">
+    <div className="px-4 py-2 bg-white border-2 border-red-400 rounded-md shadow-md">
       <div className="flex flex-col">
         <div className="text-lg font-bold">{data.name}</div>
         <div className="text-xs text-gray-500">ID: {id}</div>
@@ -31,8 +31,8 @@ export const EndNode = ({ data, id }: EndNodeProps): JSX.Element => {
             <div className="text-xs text-gray-400">
               含 {outputFieldCount} 个输出字段
             </div>
-            {outputFieldCount > 0 && (
-              <div className="text-xs text-gray-400 mt-1">
+            {outputFieldCount > 0 && data.output.content && data.output.content[0] && (
+              <div className="mt-1 text-xs text-gray-400">
                 主要输出: {data.output.content[0].key}
               </div>
             )}
