@@ -38,10 +38,7 @@ export default defineConfig({
           if (id === 'react') return 'React';
           if (id === 'react-dom') return 'ReactDOM';
           if (id === 'react/jsx-runtime') return 'jsxRuntime';
-          if (id === 'reactflow') return 'ReactFlow';
-          if (id.startsWith('reactflow/')) {
-            return 'ReactFlow';
-          }
+          if (id.startsWith('reactflow')) return 'ReactFlow';
           return id;
         },
         // 确保 CSS 文件被正确地复制
@@ -57,7 +54,12 @@ export default defineConfig({
     cssCodeSplit: false,
   },
   // 定义UMD构建需要的全局变量配置
-  define: {
-    'process.env.UMD_BUILD': JSON.stringify(true),
-  },
+  define: process.env.FORMAT === 'umd' 
+    ? {
+        // 在UMD构建中不使用process.env访问
+        '__UMD_BUILD__': true,
+      }
+    : {
+        'process.env.UMD_BUILD': JSON.stringify(true),
+      },
 }); 

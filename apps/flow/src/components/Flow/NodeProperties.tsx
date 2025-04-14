@@ -14,11 +14,73 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
     if (selectedNode) {
       setNodeData({ ...selectedNode.data });
       setNewNodeId(selectedNode.id);
+      
+      // 初始化EndNode的数据结构
+      if (selectedNode.type === 'node-end' && selectedNode.data) {
+        // 延迟一下，确保nodeData已经设置好
+        setTimeout(() => {
+          const nodeData = selectedNode.data;
+          if (!nodeData.output) {
+            const updatedData = {
+              ...nodeData,
+              output: { type: 'form', content: [] }
+            };
+            onNodeUpdate(selectedNode.id, updatedData);
+          } else if (!nodeData.output.content) {
+            const updatedData = {
+              ...nodeData,
+              output: { 
+                ...nodeData.output,
+                content: [] 
+              }
+            };
+            onNodeUpdate(selectedNode.id, updatedData);
+          }
+        }, 100);
+      }
     } else {
       setNodeData(null);
       setNewNodeId('');
     }
-  }, [selectedNode]);
+  }, [selectedNode, onNodeUpdate]);
+
+  // 为 EndNode 提供的额外初始化 effect
+  useEffect(() => {
+    if (selectedNode && nodeData && selectedNode.type === 'node-end') {
+      // 确保output对象初始化
+      if (!nodeData.output) {
+        setNodeData((prevData: Record<string, any>) => {
+          const updatedData = { 
+            ...prevData, 
+            output: { 
+              type: 'form', 
+              content: [] 
+            } 
+          };
+          // 使用setTimeout确保状态更新后再调用onNodeUpdate
+          setTimeout(() => {
+            onNodeUpdate(selectedNode.id, updatedData);
+          }, 0);
+          return updatedData;
+        });
+      } else if (!nodeData.output.content) {
+        // 如果output存在但content不存在，也初始化content
+        setNodeData((prevData: Record<string, any>) => {
+          const updatedData = { 
+            ...prevData, 
+            output: { 
+              ...prevData['output'],
+              content: [] 
+            } 
+          };
+          setTimeout(() => {
+            onNodeUpdate(selectedNode.id, updatedData);
+          }, 0);
+          return updatedData;
+        });
+      }
+    }
+  }, [selectedNode, nodeData, onNodeUpdate]);
 
   const handleInputChange = useCallback(
     (key: any, value: string) => {
@@ -108,27 +170,33 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
           const updatedData = { ...prevData };
           let current = updatedData;
           
-          // 导航到目标数组
-          for (let i = 0; i < keys.length; i++) {
+          // 导航到目标数组并确保路径上所有的对象都存在
+          for (let i = 0; i < keys.length - 1; i++) {
             const key = keys[i];
-            if (key && !(key in current)) {
-              current[key as keyof typeof current] = [];
-            }
-            if (i < keys.length - 1 && key) {
-              current = current[key as keyof typeof current] as Record<string, any>;
+            if (key) {
+              // 确保当前路径上的对象存在
+              if (!(key in current)) {
+                current[key] = {}; // 初始化为空对象
+              }
+              // 确保是对象类型然后再继续
+              if (typeof current[key] !== 'object' || current[key] === null) {
+                current[key] = {};
+              }
+              current = current[key] as Record<string, any>;
             }
           }
           
           // 添加新字段
           const lastKey = keys[keys.length - 1];
           if (lastKey) {
-            const targetArray = current[lastKey as keyof typeof current] as Array<any>;
-            if (Array.isArray(targetArray)) {
-              targetArray.push({ ...template });
+            // 确保最后一个键存在并且是数组类型
+            if (!(lastKey in current) || !Array.isArray(current[lastKey])) {
+              current[lastKey] = [];
             }
+            const targetArray = current[lastKey] as Array<any>;
+            targetArray.push({ ...template });
           }
           
-          // 只更新一次状态后再调用 onNodeUpdate
           return updatedData;
         });
         
@@ -156,7 +224,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
         label: string;
         type: 'text' | 'select';
         options?: Array<{value: string; label: string}>;
-      }>
+      }>,
+      template?: any // Optional template parameter
     ) => {
       if (!nodeData) return null;
       
@@ -166,7 +235,10 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
         let current = nodeData;
         
         for (const key of keys) {
-          if (!current || !(key in current)) return [];
+          if (!current || !(key in current)) {
+            // 如果当前对象或键不存在，返回一个空数组
+            return [];
+          }
           current = current[key as keyof typeof current];
         }
         
@@ -174,13 +246,19 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
       };
       
       const arrayData = getArrayData();
+
+      // 创建默认的模板，如果没有提供则基于字段创建
+      const fieldTemplate = template || fields.reduce((acc: Record<string, string>, field) => {
+        acc[field.key] = field.key === 'type' ? 'input' : ''; // 为type字段默认设置为'input'
+        return acc;
+      }, {});
       
       return (
         <div className="p-2 my-3 border border-gray-200 rounded-md">
           <h4 className="mb-2 text-sm font-medium text-gray-700">{titleKey}</h4>
           
           {arrayData.map((item: any, index) => (
-            <div key={index} className="p-2 mb-3 rounded bg-gray-50">
+            <div className="p-2 mb-3 rounded bg-gray-50">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-500">项目 #{index + 1}</span>
                 <button
@@ -229,7 +307,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
               </div>
               
               {fields.map((field) => (
-                <div key={field.key} className="mb-2">
+                <div className="mb-2">
                   <label className="block mb-1 text-xs font-medium text-gray-700">
                     {field.label}
                   </label>
@@ -276,7 +354,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
                       }}
                     >
                       {field.options?.map((option) => (
-                        <option key={option.value} value={option.value}>
+                        <option value={option.value}>
                           {option.label}
                         </option>
                       ))}
@@ -329,10 +407,7 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             </div>
           ))}
           
-          {renderAddFieldButton(arrayPath, fields.reduce((acc: Record<string, string>, field) => {
-            acc[field.key] = '';
-            return acc;
-          }, {}))}
+          {renderAddFieldButton(arrayPath, fieldTemplate)}
         </div>
       );
     },
@@ -388,7 +463,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'value', label: '值' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
@@ -471,7 +547,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'field', label: '引用字段' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       {/* 内容配置 */}
@@ -484,7 +561,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'field', label: '引用字段' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
@@ -500,48 +578,69 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
     </>
   );
 
-  const renderEndNodeForm = () => (
-    <>
-      <div className="mb-4">
-        <label className="block mb-1 text-sm font-medium text-gray-700">节点名称</label>
-        <input
-          type="text"
-          className="w-full p-2 border rounded-md"
-          value={nodeData.name || ''}
-          onChange={(e) => handleInputChange('name', e.target.value)}
-        />
-      </div>
-      
-      <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
-      <div className="mb-4">
-        <label className="block mb-1 text-sm font-medium text-gray-700">输出类型</label>
-        <select
-          className="w-full p-2 border rounded-md"
-          value={nodeData.output?.type || 'form'}
-          onChange={(e) => handleInputChange('output.type', e.target.value)}
-        >
-          <option value="form">表单</option>
-          <option value="json">JSON</option>
-          <option value="text">文本</option>
-        </select>
-      </div>
-      
-      {/* 输出内容字段配置 */}
-      {renderArrayField(
-        'output.content',
-        '输出字段配置',
-        [
-          { key: 'type', label: '类型', type: 'select', options: [
-            { value: 'input', label: '固定输入' },
-            { value: 'field', label: '引用字段' }
-          ]},
-          { key: 'key', label: '键名', type: 'text' },
-          { key: 'value', label: '值', type: 'text' },
-          { key: 'description', label: '描述', type: 'text' }
-        ]
-      )}
-    </>
-  );
+  const renderEndNodeForm = () => {
+    return (
+      <>
+        <div className="mb-4">
+          <label className="block mb-1 text-sm font-medium text-gray-700">节点名称</label>
+          <input
+            type="text"
+            className="w-full p-2 border rounded-md"
+            value={nodeData.name || ''}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+          />
+        </div>
+        
+        <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
+        <div className="mb-4">
+          <label className="block mb-1 text-sm font-medium text-gray-700">输出类型</label>
+          <select
+            className="w-full p-2 border rounded-md"
+            value={nodeData.output?.type || 'form'}
+            onChange={(e) => {
+              // 确保output对象已初始化
+              if (!nodeData.output) {
+                // 直接更新nodeData，而不是通过handleInputChange
+                setNodeData((prevData: Record<string, any>) => {
+                  const updatedData = { ...prevData, output: { type: e.target.value, content: [] } };
+                  // 使用setTimeout确保状态更新后再调用onNodeUpdate
+                  setTimeout(() => {
+                    if (selectedNode) {
+                      onNodeUpdate(selectedNode.id, updatedData);
+                    }
+                  }, 0);
+                  return updatedData;
+                });
+              } else {
+                handleInputChange('output.type', e.target.value);
+              }
+            }}
+          >
+            <option value="form">表单</option>
+            <option value="json">JSON</option>
+            <option value="text">文本</option>
+          </select>
+        </div>
+        
+        {/* 输出内容字段配置 */}
+        {renderArrayField(
+          'output.content',
+          '输出字段配置',
+          [
+            { key: 'type', label: '类型', type: 'select', options: [
+              { value: 'input', label: '固定输入' },
+              { value: 'field', label: '引用字段' }
+            ]},
+            { key: 'key', label: '键名', type: 'text' },
+            { key: 'value', label: '值', type: 'text' },
+            { key: 'description', label: '描述', type: 'text' }
+          ],
+          // 提供一个完整的模板，确保类型默认为'input'
+          { type: 'input', key: '', value: '', description: '' }
+        )}
+      </>
+    );
+  };
 
   const renderUtilsNodeForm = () => (
     <>
@@ -579,7 +678,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
           ]},
           { key: 'key', label: '键名', type: 'text' },
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
@@ -640,7 +740,8 @@ export const NodeProperties = ({ selectedNode, onNodeUpdate }: NodePropertiesPro
             { value: 'field', label: '引用字段' }
           ]},
           { key: 'value', label: '值', type: 'text' }
-        ]
+        ],
+        { type: 'input', key: '', value: '' }
       )}
       
       <h3 className="mt-4 mb-2 text-sm font-semibold text-gray-700">输出配置</h3>
