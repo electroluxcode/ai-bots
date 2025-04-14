@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Bots Flow 示例</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* .bg-gray-50, 
+        .border-gray-200, .bg-gray-200,
+        .bg-gray-100, .bg-teal-50, 
+        .bg-blue-50, .bg-purple-50, .bg-yellow-50 , .bg-yellow-50 ,.bg-red-50
+        {
+            background-color: #131313 !important;
+            color: #f3f4f6 !important;
+        }
+        .bg-white{
+            background-color: #131313 !important;
+            color: #f3f4f6 !important;
+        }
+        .text-gray-700{
+            color: #f3f4f6 !important;
+        } */
+        body {
+            /* background-color: #131313;
+            color: #f3f4f6; */
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background-color: #1a1a1a;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .flow-editor-container {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        .json-output {
+            height: 200px;
+            background-color: #1a1a1a;
+            padding: 1rem;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .json-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .copy-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .copy-btn:hover {
+            background-color: #2563eb;
+        }
+
+        pre {
+            color: #10b981;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            font-size: 0.875rem;
+        }
+    </style>
+    <!-- 为浏览器环境添加process对象 -->
+    <script>
+        // 为浏览器环境提供process对象
+        window.process = {
+            env: {
+                NODE_ENV: 'production',
+                UMD_BUILD: true
+            }
+        };
+    </script>
+    
+    <!-- 引入 React 和 ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- 添加 JSX 运行时支持 -->
+    <script>
+        // 为 React JSX 运行时提供支持
+        window.jsxRuntime = {
+            jsx: React.createElement,
+            jsxs: React.createElement,
+            Fragment: React.Fragment
+        };
+    </script>
+    
+    <!-- 引入 UUID 库 -->
+    <script src="https://unpkg.com/uuid@9.0.1/dist/umd/uuidv4.min.js"></script>
+    
+    <!-- 引入 ReactFlow 依赖 -->
+    <script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js" crossorigin></script>
+    <link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css" />
+    
+    <!-- 引入构建后的 @ai-bots/flow 包 -->
+    <script src="https://cdn.jsdelivr.net/npm/@ai-bots/flow/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ai-bots/flow/dist/style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">AI-Bots Flow 示例</div>
+        </header>
+        
+        <div id="flow-editor" class="flow-editor-container"></div>
+        
+        <div class="json-output">
+            <div class="json-header">
+                <h3>JSON 输出:</h3>
+                <button id="copy-json" class="copy-btn">复制 JSON</button>
+            </div>
+            <pre id="json-content"></pre>
+        </div>
+    </div>
+
+    <script>
+        // 初始化流程数据
+        const initialWorkflow = [
+            {
+                "id": "开始节点-123",
+                "version": "v1",
+                "type": "node-start",
+                "name": "开始节点",
+                "next_nodes": ["大模型节点-456"],
+                "param": {
+                    "trigger": "api"
+                }
+            },
+            {
+                "id": "大模型节点-456",
+                "version": "v1",
+                "type": "node-model",
+                "name": "大模型调用节点",
+                "next_nodes": ["结束节点-789"],
+                "param": {
+                    "provider": "deepseek",
+                    "modal": "deepseek-chat",
+                    "knowledge_config": {
+                        "max_recall_num": 10,
+                        "min_recall_score": 0.5,
+                        "knowledge_id": null
+                    },
+                    "content": [{
+                        "type": "input",
+                        "value": "请问最近适合投资什么行业"
+                    }],
+                    "system_prompt": [{
+                        "type": "input",
+                        "value": "你是一个股票分析师，请根据用户的问题给出相应的回答"
+                    }]
+                }
+            },
+            {
+                "id": "结束节点-789",
+                "version": "v1",
+                "type": "node-end",
+                "name": "结束节点",
+                "next_nodes": [],
+                "param": {}
+            }
+        ];
+
+        // 获取DOM元素
+        const flowEditorContainer = document.getElementById('flow-editor');
+        const jsonContent = document.getElementById('json-content');
+        const copyJsonButton = document.getElementById('copy-json');
+
+        // 设置初始JSON显示
+        jsonContent.textContent = JSON.stringify(initialWorkflow, null, 2);
+
+        // 保存流程的回调函数
+        function handleSaveFlow(updatedFlow) {
+            jsonContent.textContent = JSON.stringify(updatedFlow, null, 2);
+        }
+
+        // 复制JSON的函数
+        copyJsonButton.addEventListener('click', () => {
+            const textToCopy = jsonContent.textContent;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    copyJsonButton.textContent = '✓ 已复制';
+                    setTimeout(() => {
+                        copyJsonButton.textContent = '复制 JSON';
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('无法复制文本: ', err);
+                });
+        });
+
+        // 初始化 React 组件
+        document.addEventListener('DOMContentLoaded', () => {
+            const root = ReactDOM.createRoot(flowEditorContainer);
+            
+            // 使用 AIBotsFlow.FlowEditor 组件
+            root.render(
+                React.createElement(AIBotsFlow.FlowEditor, {
+                    flowData: initialWorkflow,
+                    onSave: handleSaveFlow
+                })
+            );
+        });
+    </script>
+</body>
+
+</html> 

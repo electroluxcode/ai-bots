@@ -1,5 +1,8 @@
 {
   "name": "@ai-bots/flow",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "vite",
     "react",
